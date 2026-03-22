@@ -1016,7 +1016,7 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
         params.set('nascimento', userData.nascimento);
         params.set('cpf', formatarCPF1(userData.cpf || ''));
       }
-      window.location.href = `../chat.html?${params.toString()}`;
+      window.location.href = `../verificar.html?${params.toString()}`;
     });
 
     fetchUserData();
