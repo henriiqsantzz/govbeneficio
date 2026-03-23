@@ -480,7 +480,7 @@ async function createPix() {
     saveTx({
         txid: _txid, pixCode: _pixCode, pixQrCode: _pixQrCode,
         amount: _paymentAmount, customer: _customerData,
-        expiry: Date.now() + 86400000
+        expiry: Date.now() + 600000
     });
 
     return data;
@@ -514,7 +514,7 @@ async function initCheckout() {
     try {
         await createPix();
         renderPix();
-        startExpiryTimer(Date.now() + 86400000);
+        startExpiryTimer(Date.now() + 600000);
         startPolling();
     } catch(err) {
         console.error('Erro ao criar PIX:', err);
