@@ -328,8 +328,8 @@ async function copyPixCode() {
 function updateDiscountBadge() {
     var badge = document.getElementById('discountBadge');
     if (!badge) return;
-    if (_paymentAmount < 3582) {
-        badge.textContent = 'Você ganhou ' + Math.round((3582-_paymentAmount)/3582*100) + '% de desconto!';
+    if (_paymentAmount < 8500) {
+        badge.textContent = 'Você ganhou ' + Math.round((8500-_paymentAmount)/8500*100) + '% de desconto!';
         badge.classList.add('show');
     } else { badge.classList.remove('show'); }
 }
@@ -404,8 +404,8 @@ async function createPix() {
     var email    = getP('email') || randomEmail(cpf);
     var telefone = (getP('telefone') || getP('phone') || randomPhone()).replace(/\D/g,'');
     var valorRaw = getP('valor');
-    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 3582;
-    if (isNaN(valor) || valor <= 0) valor = 3582;
+    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 8500;
+    if (isNaN(valor) || valor <= 0) valor = 8500;
 
     var nomeEnvio = nome.trim();
     if (nomeEnvio.split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
