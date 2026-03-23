@@ -1,6 +1,5 @@
 <!DOCTYPE html><html lang="pt-BR"><head>
 
-<!-- TikTok Pixel Code Start -->
 <script>
 !function (w, d, t) {
   w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
@@ -10,8 +9,6 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
   ttq.page();
 }(window, document, 'ttq');
 </script>
-<!-- TikTok Pixel Code End -->
-
 <script>
   window.tikTokPixelId = "19cebd8877cbf1cb62fe26d1297b78272d4621f0";
   var a = document.createElement("script");
@@ -262,17 +259,28 @@ function displayQRCode(data) {
     var el = document.getElementById('qrcode');
     el.innerHTML = '';
     if (!data) return;
-    if (data.startsWith('data:image')) {
+    
+    // CORREÇÃO DO QR CODE AQUI 👇
+    var qrBase64 = data;
+    
+    if (qrBase64 && !qrBase64.startsWith('http')) { 
+        // Se for Base64 puro da API (sem o prefixo de imagem e não for uma URL)
+        if (!qrBase64.startsWith('data:image')) {
+            qrBase64 = 'data:image/png;base64,' + qrBase64;
+        }
         var img = document.createElement('img');
-        img.src = data; img.alt = 'QR Code PIX';
+        img.src = qrBase64; img.alt = 'QR Code PIX';
         img.style.cssText = 'max-width:100%;height:auto;display:block;margin:0 auto;';
-        el.appendChild(img); return;
+        el.appendChild(img);
+    } else {
+        // Fallback: Se não for Base64 (for apenas a string do Pix Copia e Cola)
+        var img2 = document.createElement('img');
+        img2.src = 'https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=' + encodeURIComponent(data);
+        img2.alt = 'QR Code PIX';
+        img2.style.cssText = 'max-width:100%;height:auto;display:block;margin:0 auto;';
+        el.appendChild(img2);
     }
-    var img2 = document.createElement('img');
-    img2.src = 'https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=' + encodeURIComponent(data);
-    img2.alt = 'QR Code PIX';
-    img2.style.cssText = 'max-width:100%;height:auto;display:block;margin:0 auto;';
-    el.appendChild(img2);
+    // FIM DA CORREÇÃO 👆
 }
 
 function startExpiryTimer(expiry) {
