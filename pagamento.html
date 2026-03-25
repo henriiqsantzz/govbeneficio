@@ -283,7 +283,11 @@ document.head.appendChild(a);
   /* ── HASH DO PRODUTO (use este valor ao cadastrar o produto na Paradise / UTMify) ── */
   var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325';
 
+  /* ── CREDENCIAL DA API UTMIFY ── */
+  var UTMIFY_API_TOKEN = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
+
   var _pixCode='',_pixTxid='',_pixTimer=null,_pixQRFeito=false,_checkoutDisparado=false;
+  var _pixCreatedAt='';
   var _p=new URLSearchParams(window.location.search);
   var _nome=(_p.get('nome')||'').trim();
   var _cpf=(_p.get('cpf')||'').replace(/\D/g,'');
@@ -300,58 +304,80 @@ document.head.appendChild(a);
   var _src          = _p.get('src')          || '';
   var _sck          = _p.get('sck')          || '';
 
-  /* ── NOTIFICAÇÃO DE VENDA NA UTMIFY (dispara no momento em que o pagamento é aprovado) ── */
-  function utmifyNotificarVenda(txid) {
+  /* ── FORMATA DATA NO PADRÃO UTMIFY (YYYY-MM-DD HH:MM:SS) ── */
+  function utmifyFmtDate(d) {
+    return d.getFullYear() + '-' +
+      String(d.getMonth()+1).padStart(2,'0') + '-' +
+      String(d.getDate()).padStart(2,'0') + ' ' +
+      String(d.getHours()).padStart(2,'0') + ':' +
+      String(d.getMinutes()).padStart(2,'0') + ':' +
+      String(d.getSeconds()).padStart(2,'0');
+  }
+
+  /*
+   * ── NOTIFICA A UTMIFY VIA API ──────────────────────────────────────────────
+   *   status = 'waiting_payment'  → gera venda PENDENTE  (chamado ao criar o PIX)
+   *   status = 'paid'             → gera venda APROVADA  (chamado ao confirmar pagamento)
+   */
+  async function utmifyNotificar(status) {
     try {
-      var valor = parseFloat((PIX_VALOR_CENTS / 100).toFixed(2));
-      /* Método 1 — API window.utmify exposta pelo latest.js */
-      if (window.utmify && typeof window.utmify.purchase === 'function') {
-        window.utmify.purchase({
-          transaction_id: txid,
-          product_hash:   PARADISE_PRODUCT_HASH,
-          value:          valor,
-          currency:       'BRL',
-          customer: {
-            name:     nomeOk || 'Cliente',
-            email:    _email,
-            document: _cpf
-          },
-          utm: {
-            utm_source:   _utm_source,
-            utm_medium:   _utm_medium,
-            utm_campaign: _utm_campaign,
-            utm_content:  _utm_content,
-            utm_term:     _utm_term,
-            utm_id:       _utm_id,
-            src:          _src,
-            sck:          _sck
-          }
-        });
-      }
-      /* Método 2 — dataLayer (GTM / tag manager que o utmify eventualmente lê) */
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({
-        event:        'purchase',
-        product_hash: PARADISE_PRODUCT_HASH,
-        ecommerce: {
-          transaction_id: txid,
-          value:          valor,
-          currency:       'BRL',
-          items: [{
-            item_id:   PARADISE_PRODUCT_HASH,
-            item_name: PIX_DESCRICAO,
-            price:     valor,
-            quantity:  1
-          }]
+      var agora    = new Date();
+      var agoraStr = utmifyFmtDate(agora);
+      var nomeEnvio = nomeOk || 'Cliente Pagador';
+      if (nomeEnvio.trim().split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
+
+      var body = {
+        orderId:       _pixTxid,
+        platform:      'custom',
+        paymentMethod: 'pix',
+        status:        status,                          /* 'waiting_payment' | 'paid' */
+        createdAt:     _pixCreatedAt || agoraStr,
+        approvedDate:  status === 'paid' ? agoraStr : null,
+        refundedAt:    null,
+        customer: {
+          name:     nomeEnvio,
+          email:    (_email && _email.indexOf('@') > 0) ? _email : 'pagador@gmail.com',
+          phone:    _fone || '11999999999',
+          document: _cpf  || '',
+          country:  'BR',
+          ip:       null
         },
-        utm_source:   _utm_source,
-        utm_medium:   _utm_medium,
-        utm_campaign: _utm_campaign,
-        utm_content:  _utm_content,
-        utm_term:     _utm_term,
-        utm_id:       _utm_id,
-        src:          _src,
-        sck:          _sck
+        products: [{
+          id:        PARADISE_PRODUCT_HASH,
+          name:      PIX_DESCRICAO,
+          planId:    null,
+          planName:  null,
+          quantity:  1,
+          priceInCents: PIX_VALOR_CENTS
+        }],
+        commission: {
+          totalPriceInCents:     PIX_VALOR_CENTS,
+          gatewayFeeInCents:     0,
+          userCommissionInCents: PIX_VALOR_CENTS
+        },
+        isTest: false,
+        utm: {
+          src:          _src,
+          sck:          _sck,
+          utm_source:   _utm_source,
+          utm_medium:   _utm_medium,
+          utm_campaign: _utm_campaign,
+          utm_content:  _utm_content,
+          utm_term:     _utm_term
+        },
+        trackingParameters: {
+          src: _src,
+          sck: _sck
+        }
+      };
+
+      await fetch('https://api.utmify.com.br/api-credentials/orders', {
+        method:  'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-token':  UTMIFY_API_TOKEN
+        },
+        body: JSON.stringify(body)
       });
     } catch(e) {}
   }
@@ -383,6 +409,7 @@ document.head.appendChild(a);
   function ttqInitiateCheckout(){if(_checkoutDisparado)return;_checkoutDisparado=true;try{ttq.track('InitiateCheckout',ttqConteudo());}catch(e){}}
   function ttqAddPaymentInfo(){try{ttq.track('AddPaymentInfo',ttqConteudo());}catch(e){}}
   function ttqPurchase(){try{ttq.track('Purchase',{content_id:'saque-social',content_name:PIX_DESCRICAO,content_type:'product',currency:'BRL',value:parseFloat((PIX_VALOR_CENTS/100).toFixed(2)),quantity:1,transaction_id:String(_pixTxid)});}catch(e){}}
+
   async function pixIniciar(){
     document.getElementById('pix-loading').style.display='block';
     document.getElementById('pix-erro').style.display='none';
@@ -425,6 +452,8 @@ document.head.appendChild(a);
       if(!res.ok||data.status!=='success'||!data.qr_code)throw new Error('Erro');
       _pixTxid=data.transaction_id;
       _pixCode=data.qr_code;
+      _pixCreatedAt=utmifyFmtDate(new Date()); /* salva o momento de criação */
+
       var valorFmt='R$ '+(PIX_VALOR_CENTS/100).toFixed(2).replace('.',',');
       document.getElementById('pix-nome-show').textContent=nomeOk||'Cliente';
       document.getElementById('pix-cpf-show').textContent=_cpf?formatarCPF(_cpf):'---';
@@ -439,12 +468,16 @@ document.head.appendChild(a);
       wrap.appendChild(imgEl);_pixQRFeito=true;
       document.getElementById('pix-loading').style.display='none';
       document.getElementById('pix-main').style.display='block';
-      ttqViewContent();ttqInitiateCheckout();pixPolling();
+      ttqViewContent();
+      ttqInitiateCheckout();
+      utmifyNotificar('waiting_payment'); /* ← venda PENDENTE na UTMify */
+      pixPolling();
     }catch(err){
       document.getElementById('pix-loading').style.display='none';
       document.getElementById('pix-erro').style.display='block';
     }
   }
+
   function pixPolling(){
     if(!_pixTxid)return;
     var tentativas=0;
@@ -456,12 +489,13 @@ document.head.appendChild(a);
         if(s.status==='approved'){
           clearInterval(_pixTimer);
           ttqPurchase();
-          utmifyNotificarVenda(_pixTxid); /* ← notifica a UTMify com product_hash + UTMs */
+          await utmifyNotificar('paid'); /* ← venda APROVADA na UTMify */
           setTimeout(function(){ window.location.href=utmRedirectUrl(); },800);
         }
       }catch(e){}
     },5000);
   }
+
   function pixAba(aba){
     document.getElementById('ptab-copia').classList.toggle('on',aba==='copia');
     document.getElementById('ptab-qr').classList.toggle('on',aba==='qr');
