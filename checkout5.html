@@ -1,5 +1,6 @@
-<!DOCTYPE html><html lang="pt-BR"><head>
-
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
 <script>
 !function (w, d, t) {
   w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
@@ -9,6 +10,7 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
   ttq.page();
 }(window, document, 'ttq');
 </script>
+<script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 <script>
   window.tikTokPixelId = "19cebd8877cbf1cb62fe26d1297b78272d4621f0";
   var a = document.createElement("script");
@@ -16,7 +18,6 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
   a.setAttribute("src","https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js");
   document.head.appendChild(a);
 </script>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checkout - Pagamento PIX</title>
@@ -102,7 +103,6 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
     @media (max-width: 640px) { .checkout-content { padding: 1.5rem; } }
 </style>
 </head>
-
 <body>
 <div class="checkout-container">
     <div class="top-header">
@@ -113,43 +113,35 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
             <div class="amount-value" id="amountValue">R$ 0,00</div>
         </div>
     </div>
-
     <div class="checkout-header">
         <h1>Para finalizar, efetue o pagamento com PIX!</h1>
         <div class="discount-badge" id="discountBadge"></div>
     </div>
-
     <div class="checkout-content">
         <div id="loadingContainer" class="loading-container" style="display: none;">
             <div class="loading-spinner"></div>
             <div class="loading-text">Gerando código PIX...</div>
         </div>
-
         <div id="errorContainer" class="error-message hidden">
             <p id="errorText">Nome e documento (CPF) são obrigatórios na URL.</p>
             <button class="retry-button mt-4" onclick="initCheckout()">Tentar novamente</button>
         </div>
-
         <div id="pixContainer" class="pix-container">
             <div class="status-container waiting" id="statusContainer">
                 <div class="status-text">⏳ Aguardando pagamento...</div>
             </div>
-
             <div class="qr-code-container" id="qrCodeContainer">
                 <div id="qrcode"></div>
                 <p style="color:#6b7280;font-size:0.875rem;margin-top:0.5rem;">Escaneie o QR Code com o app do seu banco</p>
             </div>
-
             <div class="pix-code-container" id="pixCodeContainer">
                 <div class="pix-code-label">Copie a chave abaixo e utilize a opção PIX Copia e Cola:</div>
                 <div class="pix-code-value" id="pixCode"></div>
                 <button class="copy-button" onclick="copyPixCode()" id="copyButton">📋 COPIAR CÓDIGO</button>
             </div>
-
             <div class="payment-method-toggle">
                 <button class="method-toggle-btn" id="togglePaymentMethod" onclick="togglePaymentMethod()">📱 Mudar para QR Code</button>
             </div>
-
             <div class="instructions">
                 <div class="instructions-header" onclick="toggleInstructions()">
                     <h3>Instruções para pagamento</h3>
@@ -161,11 +153,9 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
                     <div class="instruction-step"><div class="step-icon">3</div><div class="step-text">Realize o pagamento.</div></div>
                 </div>
             </div>
-
             <div class="expiration-timer" id="expirationTimer" style="display: none;">
                 O código expira em: <span class="timer-value" id="timerValue">10:00</span>
             </div>
-
             <div id="payerInfo" class="payer-info" style="display: none;">
                 <div class="payer-name" id="payerName"></div>
                 <div class="payer-document" id="payerDocument"></div>
@@ -173,27 +163,30 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
         </div>
     </div>
 </div>
-
 <script src="js/url-params.js"></script>
 <script src="js/main.js"></script>
 <script>
 // =====================================================
-// CONFIGURAÇÃO — BLACKCAT PAY
+// CONFIGURAÇÃO — PARADISE PAY
 // =====================================================
-var BLACKCAT_API_URL = 'https://api.blackcatpay.com.br/api';
-var BLACKCAT_API_KEY = 'sk_live_61ab2d43146721659324096a00d68c11f784242367a8469dae090c9ddf0c07d8';
+var PARADISE_API_URL  = 'https://multi.paradisepags.com/api/v1';
+var PARADISE_API_KEY  = 'sk_220715873acbf9718fdd92d1d08b541320f5c7c711b5017be8cb91edc9192bdf';
+var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325'; /* hash do produto cadastrado na Paradise */
+
+/* ── CREDENCIAL DA API UTMIFY ── */
+var UTMIFY_API_TOKEN  = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
 
 var redirectUrls = {
-    1320: 'https://govbeneficio.vercel.app/up5.html',
-    3582: 'https://govbeneficio.vercel.app/up5.html',
-    2790: 'https://govbeneficio.vercel.app/up5.html',
-    1320: 'https://govbeneficio.vercel.app/up5.html',
-    8500: 'https://govbeneficio.vercel.app/up5.html',
-    4560: 'https://govbeneficio.vercel.app/up5.html',
-    1825: 'https://govbeneficio.vercel.app/up5.html',
-    100:  'https://govbeneficio.vercel.app/up5.html'
+    6187: 'https://govbeneficio.vercel.app/obrigado.html',
+    3582: 'https://govbeneficio.vercel.app/obrigado.html',
+    2790: 'https://govbeneficio.vercel.app/obrigado.html',
+    1320: 'https://govbeneficio.vercel.app/obrigado.html',
+    8500: 'https://govbeneficio.vercel.app/obrigado.html',
+    4560: 'https://govbeneficio.vercel.app/obrigado.html',
+    1825: 'https://govbeneficio.vercel.app/obrigado.html',
+    100:  'https://govbeneficio.vercel.app/obrigado.html'
 };
-var DEFAULT_REDIRECT = 'https://govbeneficio.vercel.app/up5.html';
+var DEFAULT_REDIRECT = 'https://govbeneficio.vercel.app/obrigado.html';
 // =====================================================
 
 var _txid          = null;
@@ -203,7 +196,18 @@ var _pollingTimer  = null;
 var _expiryTimer   = null;
 var _paymentAmount = 4560;
 var _customerData  = {};
-var STORAGE_KEY    = 'blackcat_pix_tx3';
+var _pixCreatedAt  = '';
+var STORAGE_KEY    = 'paradise_pix_tx6';
+
+/* ── CAPTURA DE PARÂMETROS UTM ── */
+var _p            = new URLSearchParams(window.location.search);
+var _utm_source   = _p.get('utm_source')   || '';
+var _utm_medium   = _p.get('utm_medium')   || '';
+var _utm_campaign = _p.get('utm_campaign') || '';
+var _utm_content  = _p.get('utm_content')  || '';
+var _utm_term     = _p.get('utm_term')     || '';
+var _src          = _p.get('src')          || '';
+var _sck          = _p.get('sck')          || '';
 
 function getP(key) {
     var p = new URLSearchParams(window.location.search);
@@ -223,7 +227,6 @@ function randomPhone() {
     var ddds = ['11','21','31','41','47','48','51','61','71','81','85'];
     return ddds[Math.floor(Math.random()*ddds.length)] + (Math.floor(10000000+Math.random()*90000000));
 }
-
 function saveTx(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e){} }
 function loadTx() {
     try {
@@ -235,7 +238,6 @@ function loadTx() {
     } catch(e){ return null; }
 }
 function clearTx() { try { localStorage.removeItem(STORAGE_KEY); } catch(e){} }
-
 function showLoading(yes) { document.getElementById('loadingContainer').style.display = yes ? 'block' : 'none'; }
 function showError(msg) {
     var ec = document.getElementById('errorContainer');
@@ -254,17 +256,12 @@ function setStatus(type, html) {
     el.style.display = 'block';
     el.innerHTML = html;
 }
-
 function displayQRCode(data) {
     var el = document.getElementById('qrcode');
     el.innerHTML = '';
     if (!data) return;
-    
-    // CORREÇÃO DO QR CODE AQUI 👇
     var qrBase64 = data;
-    
-    if (qrBase64 && !qrBase64.startsWith('http')) { 
-        // Se for Base64 puro da API (sem o prefixo de imagem e não for uma URL)
+    if (qrBase64 && !qrBase64.startsWith('http')) {
         if (!qrBase64.startsWith('data:image')) {
             qrBase64 = 'data:image/png;base64,' + qrBase64;
         }
@@ -273,16 +270,13 @@ function displayQRCode(data) {
         img.style.cssText = 'max-width:100%;height:auto;display:block;margin:0 auto;';
         el.appendChild(img);
     } else {
-        // Fallback: Se não for Base64 (for apenas a string do Pix Copia e Cola)
         var img2 = document.createElement('img');
         img2.src = 'https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=' + encodeURIComponent(data);
         img2.alt = 'QR Code PIX';
         img2.style.cssText = 'max-width:100%;height:auto;display:block;margin:0 auto;';
         el.appendChild(img2);
     }
-    // FIM DA CORREÇÃO 👆
 }
-
 function startExpiryTimer(expiry) {
     if (_expiryTimer) clearInterval(_expiryTimer);
     var timerEl = document.getElementById('expirationTimer');
@@ -299,7 +293,6 @@ function startExpiryTimer(expiry) {
     tick();
     _expiryTimer = setInterval(tick, 1000);
 }
-
 var _currentMethod = 'copy';
 function togglePaymentMethod(method) {
     var btn  = document.getElementById('togglePaymentMethod');
@@ -314,12 +307,10 @@ function togglePaymentMethod(method) {
         if (btn) btn.textContent = '📋 Mudar para Copia e Cola';
     }
 }
-
 function toggleInstructions() {
     document.getElementById('instructionsContent').classList.toggle('expanded');
     document.getElementById('instructionsToggle').classList.toggle('expanded');
 }
-
 async function copyPixCode() {
     if (!_pixCode) return;
     try { await navigator.clipboard.writeText(_pixCode); } catch(e) {
@@ -332,7 +323,6 @@ async function copyPixCode() {
     btn.textContent = '✓ Código copiado!'; btn.classList.add('copied');
     setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
 }
-
 function updateDiscountBadge() {
     var badge = document.getElementById('discountBadge');
     if (!badge) return;
@@ -341,7 +331,6 @@ function updateDiscountBadge() {
         badge.classList.add('show');
     } else { badge.classList.remove('show'); }
 }
-
 function renderPix() {
     document.getElementById('amountValue').textContent = fmtBRL(_paymentAmount);
     updateDiscountBadge();
@@ -357,6 +346,81 @@ function renderPix() {
 }
 
 // =====================================================
+// FORMATA DATA NO PADRÃO UTMIFY (YYYY-MM-DD HH:MM:SS)
+// =====================================================
+function utmifyFmtDate(d) {
+    return d.getFullYear() + '-' +
+        String(d.getMonth()+1).padStart(2,'0') + '-' +
+        String(d.getDate()).padStart(2,'0') + ' ' +
+        String(d.getHours()).padStart(2,'0') + ':' +
+        String(d.getMinutes()).padStart(2,'0') + ':' +
+        String(d.getSeconds()).padStart(2,'0');
+}
+
+// =====================================================
+// NOTIFICA A UTMIFY VIA API
+//   status = 'waiting_payment' → venda PENDENTE
+//   status = 'paid'            → venda APROVADA
+// =====================================================
+async function utmifyNotificar(status) {
+    try {
+        var agora    = new Date();
+        var agoraStr = utmifyFmtDate(agora);
+        var nomeCliente = (_customerData.nome || 'Cliente Pagador').trim();
+        if (nomeCliente.split(' ').filter(Boolean).length < 2) nomeCliente += ' Pagador';
+        var body = {
+            orderId:       String(_txid),
+            platform:      'custom',
+            paymentMethod: 'pix',
+            status:        status,
+            createdAt:     _pixCreatedAt || agoraStr,
+            approvedDate:  status === 'paid' ? agoraStr : null,
+            refundedAt:    null,
+            customer: {
+                name:     nomeCliente,
+                email:    _customerData.email || randomEmail(_customerData.documento),
+                phone:    _customerData.telefone || randomPhone(),
+                document: _customerData.documento || '',
+                country:  'BR',
+                ip:       null
+            },
+            products: [{
+                id:           PARADISE_PRODUCT_HASH,
+                name:         'Pagamento Aprovado.',
+                planId:       null,
+                planName:     null,
+                quantity:     1,
+                priceInCents: _paymentAmount
+            }],
+            commission: {
+                totalPriceInCents:     _paymentAmount,
+                gatewayFeeInCents:     0,
+                userCommissionInCents: _paymentAmount
+            },
+            isTest: false,
+            utm: {
+                src:          _src,
+                sck:          _sck,
+                utm_source:   _utm_source,
+                utm_medium:   _utm_medium,
+                utm_campaign: _utm_campaign,
+                utm_content:  _utm_content,
+                utm_term:     _utm_term
+            },
+            trackingParameters: {
+                src: _src,
+                sck: _sck
+            }
+        };
+        await fetch('https://api.utmify.com.br/api-credentials/orders', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-token': UTMIFY_API_TOKEN },
+            body:    JSON.stringify(body)
+        });
+    } catch(e) {}
+}
+
+// =====================================================
 // REDIRECIONA APÓS APROVAÇÃO — REPASSA TODOS OS PARAMS
 // =====================================================
 function redirectAfterPayment() {
@@ -369,31 +433,31 @@ function redirectAfterPayment() {
 }
 
 // =====================================================
-// POLLING — BLACKCAT PAY
-// GET /sales/{transactionId}/status
-// Status aprovado: "PAID"
+// POLLING — PARADISE PAY
+// GET /api/v1/query.php?action=get_transaction&id={id}
+// Status aprovado: "approved"
 // =====================================================
 function startPolling() {
     if (!_txid) return;
-    console.log('Polling Blackcat para transactionId:', _txid);
+    console.log('Polling Paradise para transaction_id:', _txid);
     var attempts = 0;
     _pollingTimer = setInterval(async function() {
         attempts++;
         if (attempts > 180) { clearInterval(_pollingTimer); return; }
         try {
             var r = await fetch(
-                BLACKCAT_API_URL + '/sales/' + encodeURIComponent(_txid) + '/status',
-                { headers: { 'X-API-Key': BLACKCAT_API_KEY } }
+                PARADISE_API_URL + '/query.php?action=get_transaction&id=' + encodeURIComponent(_txid),
+                { headers: { 'X-API-Key': PARADISE_API_KEY } }
             );
             var s = await r.json();
-            console.log('Polling tentativa ' + attempts + ':', s.data && s.data.status);
-
-            if (s.success && s.data && s.data.status === 'PAID') {
+            console.log('Polling tentativa ' + attempts + ':', s.status);
+            if (s.status === 'approved') {
                 clearInterval(_pollingTimer);
                 clearTx();
+                await utmifyNotificar('paid'); /* ← venda APROVADA na UTMify */
                 setStatus('paid', '<div class="status-icon">✅</div><div class="status-text">Pagamento confirmado!</div>');
                 redirectAfterPayment();
-            } else if (s.success && s.data && ['CANCELLED','REFUNDED'].includes(s.data.status)) {
+            } else if (s.status === 'failed' || s.status === 'refunded' || s.status === 'chargeback') {
                 clearInterval(_pollingTimer);
                 clearTx();
                 setStatus('error', '<div class="status-icon">❌</div><div class="status-text">Pagamento cancelado ou expirado.</div>');
@@ -403,8 +467,8 @@ function startPolling() {
 }
 
 // =====================================================
-// CRIA PIX — BLACKCAT PAY
-// POST /sales/create-sale  |  Auth: X-API-Key
+// CRIA PIX — PARADISE PAY
+// POST /api/v1/transaction.php  |  Auth: X-API-Key
 // =====================================================
 async function createPix() {
     var nome     = getP('nome') || getP('name') || '';
@@ -414,75 +478,58 @@ async function createPix() {
     var valorRaw = getP('valor');
     var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 4560;
     if (isNaN(valor) || valor <= 0) valor = 4560;
-
     var nomeEnvio = nome.trim();
     if (nomeEnvio.split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
-
     _paymentAmount = valor;
     _customerData  = { nome: nome, documento: cpf, email: email, telefone: telefone };
+    _pixCreatedAt  = utmifyFmtDate(new Date()); /* salva momento da criação para a UTMify */
 
+    var referencia = 'PED-' + Date.now() + '-' + Math.floor(Math.random()*9000+1000);
     var payload = {
-        amount:        valor,
-        currency:      'BRL',
-        paymentMethod: 'pix',
-        items: [
-            {
-                title:     'Pagamento Aprovado.',
-                unitPrice: valor,
-                quantity:  1,
-                tangible:  false
-            }
-        ],
+        amount:      valor,
+        description: 'Pagamento Aprovado.',
+        reference:   referencia,
+        source:      'api_externa',
+        productHash: PARADISE_PRODUCT_HASH,
         customer: {
-            name:  nomeEnvio,
-            email: email,
-            phone: telefone,
-            document: {
-                number: cpf,
-                type:   'cpf'
-            }
+            name:     nomeEnvio,
+            email:    email,
+            phone:    telefone,
+            document: cpf
         },
-        pix: {
-            expiresInDays: 1
+        tracking: {
+            utm_source:   _utm_source,
+            utm_medium:   _utm_medium,
+            utm_campaign: _utm_campaign,
+            utm_content:  _utm_content,
+            utm_term:     _utm_term,
+            src:          _src,
+            sck:          _sck
         }
     };
-
-    // Adiciona UTMs ao payload apenas se existirem
-    var utmSource   = getP('utm_source');
-    var utmMedium   = getP('utm_medium');
-    var utmCampaign = getP('utm_campaign');
-    var utmContent  = getP('utm_content');
-    var utmTerm     = getP('utm_term');
-    if (utmSource)   payload.utm_source   = utmSource;
-    if (utmMedium)   payload.utm_medium   = utmMedium;
-    if (utmCampaign) payload.utm_campaign = utmCampaign;
-    if (utmContent)  payload.utm_content  = utmContent;
-    if (utmTerm)     payload.utm_term     = utmTerm;
-
-    console.log('Blackcat payload:', JSON.stringify(payload));
-
-    var res = await fetch(BLACKCAT_API_URL + '/sales/create-sale', {
+    console.log('Paradise payload:', JSON.stringify(payload));
+    var res = await fetch(PARADISE_API_URL + '/transaction.php', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-Key': BLACKCAT_API_KEY },
+        headers: { 'Content-Type': 'application/json', 'X-API-Key': PARADISE_API_KEY },
         body:    JSON.stringify(payload)
     });
     var data = await res.json();
-    console.log('Blackcat resposta:', JSON.stringify(data));
-
-    if (!res.ok || !data.success || !data.data || !data.data.paymentData || !data.data.paymentData.copyPaste) {
+    console.log('Paradise resposta:', JSON.stringify(data));
+    if (!res.ok || data.status !== 'success' || !data.qr_code) {
         throw new Error('Erro ' + res.status + ': ' + (data.message || JSON.stringify(data)));
     }
-
-    _txid      = data.data.transactionId;
-    _pixCode   = data.data.paymentData.copyPaste;
-    _pixQrCode = data.data.paymentData.qrCodeBase64 || '';
-
+    _txid      = data.transaction_id;
+    _pixCode   = data.qr_code;
+    _pixQrCode = data.qr_code_base64 || '';
+    /* calcula expiração: usa expires_at da Paradise se disponível, senão 10 min */
+    var expiryMs = data.expires_at
+        ? new Date(data.expires_at).getTime()
+        : Date.now() + 600000;
     saveTx({
         txid: _txid, pixCode: _pixCode, pixQrCode: _pixQrCode,
         amount: _paymentAmount, customer: _customerData,
-        expiry: Date.now() + 86400000
+        expiry: expiryMs
     });
-
     return data;
 }
 
@@ -492,12 +539,10 @@ async function createPix() {
 async function initCheckout() {
     var nome = getP('nome') || getP('name') || '';
     var cpf  = getP('documento') || getP('cpf') || '';
-
     if (!nome || !cpf) {
         showError('Nome e CPF são obrigatórios na URL. Exemplo: ?nome=João Silva&documento=12345678900');
         return;
     }
-
     var saved = loadTx();
     if (saved && saved.txid) {
         console.log('Transação salva encontrada:', saved.txid);
@@ -509,22 +554,23 @@ async function initCheckout() {
         startPolling();
         return;
     }
-
     showLoading(true);
     try {
         await createPix();
         renderPix();
-        startExpiryTimer(Date.now() + 86400000);
+        utmifyNotificar('waiting_payment'); /* ← venda PENDENTE na UTMify */
+        startExpiryTimer(
+            _pixQrCode && false ? Date.now() + 600000 : Date.now() + 600000
+        );
         startPolling();
     } catch(err) {
         console.error('Erro ao criar PIX:', err);
         showError('Não foi possível gerar o PIX. ' + (err.message || '') + ' Tente novamente.');
     }
 }
-
 window.addEventListener('DOMContentLoaded', function() {
     initCheckout();
 });
 </script>
-
-</body></html>
+</body>
+</html>
