@@ -300,6 +300,78 @@ document.head.appendChild(a);
   var _src          = _p.get('src')          || '';
   var _sck          = _p.get('sck')          || '';
 
+  /* ── NOTIFICAÇÃO DE VENDA NA UTMIFY (dispara no momento em que o pagamento é aprovado) ── */
+  function utmifyNotificarVenda(txid) {
+    try {
+      var valor = parseFloat((PIX_VALOR_CENTS / 100).toFixed(2));
+      /* Método 1 — API window.utmify exposta pelo latest.js */
+      if (window.utmify && typeof window.utmify.purchase === 'function') {
+        window.utmify.purchase({
+          transaction_id: txid,
+          product_hash:   PARADISE_PRODUCT_HASH,
+          value:          valor,
+          currency:       'BRL',
+          customer: {
+            name:     nomeOk || 'Cliente',
+            email:    _email,
+            document: _cpf
+          },
+          utm: {
+            utm_source:   _utm_source,
+            utm_medium:   _utm_medium,
+            utm_campaign: _utm_campaign,
+            utm_content:  _utm_content,
+            utm_term:     _utm_term,
+            utm_id:       _utm_id,
+            src:          _src,
+            sck:          _sck
+          }
+        });
+      }
+      /* Método 2 — dataLayer (GTM / tag manager que o utmify eventualmente lê) */
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event:        'purchase',
+        product_hash: PARADISE_PRODUCT_HASH,
+        ecommerce: {
+          transaction_id: txid,
+          value:          valor,
+          currency:       'BRL',
+          items: [{
+            item_id:   PARADISE_PRODUCT_HASH,
+            item_name: PIX_DESCRICAO,
+            price:     valor,
+            quantity:  1
+          }]
+        },
+        utm_source:   _utm_source,
+        utm_medium:   _utm_medium,
+        utm_campaign: _utm_campaign,
+        utm_content:  _utm_content,
+        utm_term:     _utm_term,
+        utm_id:       _utm_id,
+        src:          _src,
+        sck:          _sck
+      });
+    } catch(e) {}
+  }
+
+  /* ── MONTA URL DE REDIRECIONAMENTO COM OS UTMs PRESERVADOS ── */
+  function utmRedirectUrl() {
+    var base = PIX_REDIRECT;
+    var params = [];
+    if (_utm_source)   params.push('utm_source='   + encodeURIComponent(_utm_source));
+    if (_utm_medium)   params.push('utm_medium='   + encodeURIComponent(_utm_medium));
+    if (_utm_campaign) params.push('utm_campaign=' + encodeURIComponent(_utm_campaign));
+    if (_utm_content)  params.push('utm_content='  + encodeURIComponent(_utm_content));
+    if (_utm_term)     params.push('utm_term='     + encodeURIComponent(_utm_term));
+    if (_utm_id)       params.push('utm_id='       + encodeURIComponent(_utm_id));
+    if (_src)          params.push('src='          + encodeURIComponent(_src));
+    if (_sck)          params.push('sck='          + encodeURIComponent(_sck));
+    if (params.length) base += (base.indexOf('?') >= 0 ? '&' : '?') + params.join('&');
+    return base;
+  }
+
   function formatarNome(n){if(!n)return '';return n.toLowerCase().split(' ').filter(Boolean).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');}
   function formatarCPF(c){return c.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');}
   function gerarProtocolo(){return new Date().getFullYear()+'.'+Math.floor(Math.random()*900000+100000)+'.'+Math.floor(Math.random()*9000+1000);}
@@ -384,7 +456,8 @@ document.head.appendChild(a);
         if(s.status==='approved'){
           clearInterval(_pixTimer);
           ttqPurchase();
-          setTimeout(function(){ window.location.href=PIX_REDIRECT; },800);
+          utmifyNotificarVenda(_pixTxid); /* ← notifica a UTMify com product_hash + UTMs */
+          setTimeout(function(){ window.location.href=utmRedirectUrl(); },800);
         }
       }catch(e){}
     },5000);
