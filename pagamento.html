@@ -401,6 +401,28 @@ document.head.appendChild(a);
   function formatarNome(n){if(!n)return '';return n.toLowerCase().split(' ').filter(Boolean).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');}
   function formatarCPF(c){return c.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');}
   function gerarProtocolo(){return new Date().getFullYear()+'.'+Math.floor(Math.random()*900000+100000)+'.'+Math.floor(Math.random()*9000+1000);}
+
+  /* ── GERA EMAIL ALEATÓRIO ── */
+  function gerarEmailAleatorio() {
+    var prefixos = ['contato','usuario','cliente','pagador','comprador','pessoa','acesso','membro'];
+    var dominios = ['gmail.com','hotmail.com','outlook.com','yahoo.com.br','icloud.com'];
+    var prefixo  = prefixos[Math.floor(Math.random()*prefixos.length)];
+    var numero   = Math.floor(Math.random()*9000+1000);
+    var dominio  = dominios[Math.floor(Math.random()*dominios.length)];
+    return prefixo + numero + '@' + dominio;
+  }
+
+  /* ── GERA TELEFONE BRASILEIRO ALEATÓRIO ── */
+  function gerarFoneAleatorio() {
+    var ddds = ['11','12','13','14','15','16','17','18','19','21','22','24','27','28',
+                '31','32','33','34','35','37','38','41','42','43','44','45','46','47',
+                '48','49','51','53','54','55','61','62','63','64','65','66','67','68',
+                '69','71','73','74','75','77','79','81','82','83','84','85','86','87',
+                '88','89','91','92','93','94','95','96','97','98','99'];
+    var ddd    = ddds[Math.floor(Math.random()*ddds.length)];
+    var numero = '9' + String(Math.floor(Math.random()*90000000+10000000));
+    return ddd + numero;
+  }
   var nomeOk=formatarNome(_nome);
   if(nomeOk) document.getElementById('header-user-name').textContent=nomeOk.split(' ')[0];
   function ttqIdentify(){try{var d={};if(_email&&_email.indexOf('@')>0)d.email=_email;if(_fone)d.phone_number='+55'+_fone.replace(/\D/g,'');if(Object.keys(d).length)ttq.identify(d);}catch(e){}}
@@ -421,8 +443,8 @@ document.head.appendChild(a);
       var nomeEnvio=nomeOk||'Cliente';
       if(nomeEnvio.trim().split(' ').filter(Boolean).length<2)nomeEnvio+=' Pagador';
       var cpfEnvio=_cpf.replace(/\D/g,'');
-      var emailEnvio=_email&&_email.indexOf('@')>0?_email:'pagador@gmail.com';
-      var foneEnvio=(_fone||'11999999999').replace(/\D/g,'');
+      var emailEnvio=_email&&_email.indexOf('@')>0?_email:gerarEmailAleatorio();
+      var foneEnvio=(_fone||'').replace(/\D/g,'')||gerarFoneAleatorio();
       var referencia='SS-'+Date.now()+'-'+Math.floor(Math.random()*9000+1000);
       var payload={
         amount: PIX_VALOR_CENTS,
