@@ -123,7 +123,7 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
             <div class="loading-text">Gerando código PIX...</div>
         </div>
         <div id="errorContainer" class="error-message hidden">
-            <p id="errorText">Nome e documento (CPF) são obrigatórios na URL.</p>
+            <p id="errorText"></p>
             <button class="retry-button mt-4" onclick="initCheckout()">Tentar novamente</button>
         </div>
         <div id="pixContainer" class="pix-container">
@@ -174,16 +174,16 @@ var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325'; /* mantido para UTMify */
 /* ── CREDENCIAL DA API UTMIFY ── */
 var UTMIFY_API_TOKEN  = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
 var redirectUrls = {
-    6187: 'https://govbeneficio.vercel.app/up2.html',
-    3582: 'https://govbeneficio.vercel.app/up2.html',
-    2790: 'https://govbeneficio.vercel.app/up2.html',
-    1320: 'https://govbeneficio.vercel.app/up2.html',
-    8500: 'https://govbeneficio.vercel.app/up2.html',
-    4560: 'https://govbeneficio.vercel.app/up2.html',
-    1825: 'https://govbeneficio.vercel.app/up2.html',
-    100:  'https://govbeneficio.vercel.app/up2.html'
+    6187: 'https://SUA-URL-AQUI.com/obrigado',
+    3582: 'https://SUA-URL-AQUI.com/obrigado',
+    2790: 'https://SUA-URL-AQUI.com/obrigado',
+    1320: 'https://SUA-URL-AQUI.com/obrigado',
+    8500: 'https://SUA-URL-AQUI.com/obrigado',
+    4560: 'https://SUA-URL-AQUI.com/obrigado',
+    1825: 'https://SUA-URL-AQUI.com/obrigado',
+    100:  'https://SUA-URL-AQUI.com/obrigado'
 };
-var DEFAULT_REDIRECT = 'https://govbeneficio.vercel.app/up2.html';
+var DEFAULT_REDIRECT = 'https://SUA-URL-AQUI.com/obrigado';
 // =====================================================
 var _txid          = null;
 var _pixCode       = '';
@@ -202,7 +202,6 @@ var _utm_content  = _p.get('utm_content')  || '';
 var _utm_term     = _p.get('utm_term')     || '';
 var _src          = _p.get('src')          || '';
 var _sck          = _p.get('sck')          || '';
-
 function getP(key) {
     var p = new URLSearchParams(window.location.search);
     return p.get(key) || '';
@@ -220,6 +219,11 @@ function randomEmail(cpf) {
 function randomPhone() {
     var ddds = ['11','21','31','41','47','48','51','61','71','81','85'];
     return ddds[Math.floor(Math.random()*ddds.length)] + (Math.floor(10000000+Math.random()*90000000));
+}
+function randomCPF() {
+    var n = '';
+    for (var i = 0; i < 11; i++) n += Math.floor(Math.random() * 10);
+    return n;
 }
 function saveTx(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e){} }
 function loadTx() {
@@ -319,7 +323,7 @@ function renderPix() {
     document.getElementById('amountValue').textContent = fmtBRL(_paymentAmount);
     updateDiscountBadge();
     if (_customerData.nome && _customerData.documento) {
-        document.getElementById('payerName').textContent = 'Indenizado: ' + _customerData.nome;
+        document.getElementById('payerName').textContent = _customerData.nome;
         document.getElementById('payerDocument').textContent = 'CPF: ' + formatCPF(_customerData.documento);
         document.getElementById('payerInfo').style.display = 'block';
     }
@@ -445,8 +449,8 @@ function startPolling() {
 // POST {DUTTYFY_PIX_URL}  |  Auth: URL criptografada (sem header)
 // =====================================================
 async function createPix() {
-    var nome     = getP('nome') || getP('name') || '';
-    var cpf      = (getP('documento') || getP('cpf')).replace(/\D/g,'');
+    var nome     = getP('nome') || getP('name') || 'Cliente Pagador';
+    var cpf      = (getP('documento') || getP('cpf') || randomCPF()).replace(/\D/g,'');
     var email    = getP('email') || randomEmail(cpf);
     var telefone = (getP('telefone') || getP('phone') || randomPhone()).replace(/\D/g,'');
     var valorRaw = getP('valor');
@@ -457,10 +461,8 @@ async function createPix() {
     _paymentAmount = valor;
     _customerData  = { nome: nome, documento: cpf, email: email, telefone: telefone };
     _pixCreatedAt  = utmifyFmtDate(new Date());
-
     /* Captura todos os parâmetros de rastreamento da URL atual */
     var utmStr = window.location.search.replace(/^\?/, '');
-
     var payload = {
         amount: valor,
         customer: {
@@ -477,9 +479,7 @@ async function createPix() {
         paymentMethod: 'PIX',
         utm: utmStr
     };
-
     console.log('Duttyfy payload:', JSON.stringify(payload));
-
     var res = await fetch(DUTTYFY_PIX_URL, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -487,14 +487,11 @@ async function createPix() {
     });
     var data = await res.json();
     console.log('Duttyfy resposta:', JSON.stringify(data));
-
     if (!res.ok || !data.pixCode || !data.transactionId) {
         throw new Error('Erro ' + res.status + ': ' + (data.message || JSON.stringify(data)));
     }
-
     _txid    = data.transactionId;
     _pixCode = data.pixCode;
-
     /* Duttyfy não retorna expires_at — usa 10 min */
     var expiryMs = Date.now() + 600000;
     saveTx({
@@ -505,15 +502,9 @@ async function createPix() {
     return data;
 }
 // =====================================================
-// INICIALIZAÇÃO
+// INICIALIZAÇÃO — GERA PIX DIRETO SEM EXIGIR DADOS
 // =====================================================
 async function initCheckout() {
-    var nome = getP('nome') || getP('name') || '';
-    var cpf  = getP('documento') || getP('cpf') || '';
-    if (!nome || !cpf) {
-        showError('Nome e CPF são obrigatórios na URL. Exemplo: ?nome=João Silva&documento=12345678900');
-        return;
-    }
     var saved = loadTx();
     if (saved && saved.txid) {
         console.log('Transação salva encontrada:', saved.txid);
