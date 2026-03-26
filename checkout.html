@@ -246,7 +246,7 @@
     var _pixCode       = '';
     var _pollingTimer  = null;
     var _expiryTimer   = null;
-    var _paymentAmount = 3582;
+    var _paymentAmount = 2500;
     var _customerData  = {};
     var _pixCreatedAt  = '';
     var STORAGE_KEY    = 'duttyfy_pix_tx1';
@@ -410,8 +410,8 @@
     function updateDiscountBadge() {
         var badge = document.getElementById('discountBadge');
         if (!badge) return;
-        if (_paymentAmount < 3582) {
-            badge.textContent = 'Você ganhou ' + Math.round((3582-_paymentAmount)/3582*100) + '% de desconto!';
+        if (_paymentAmount < 2500) {
+            badge.textContent = 'Você ganhou ' + Math.round((2500-_paymentAmount)/2500*100) + '% de desconto!';
             badge.classList.add('show');
         } else { 
             badge.classList.remove('show'); 
@@ -555,8 +555,8 @@
         var telefone = (getP('telefone') || getP('phone') || randomPhone()).replace(/\D/g,'');
         
         var valorRaw = getP('valor');
-        var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 3582;
-        if (isNaN(valor) || valor <= 0) valor = 3582;
+        var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 2500;
+        if (isNaN(valor) || valor <= 0) valor = 2500;
         
         var nomeEnvio = nome.trim();
         if (nomeEnvio.split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
