@@ -309,14 +309,24 @@ document.head.appendChild(a);
       String(d.getSeconds()).padStart(2,'0');
   }
 
+  // BLINDAGEM NO PAYLOAD PARA UTMIFY NÃO RECUSAR
   async function utmifyNotificar(status) {
     try {
       var agora    = new Date();
       var agoraStr = utmifyFmtDate(agora);
+      
+      // Regra 1: Nome precisa ter sobrenome, senão utmify pode recusar
       var nomeEnvio = nomeOk || 'Cliente Pagador';
       if (nomeEnvio.trim().split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
+
+      // Regra 2: orderId nunca pode ir vazio e tem que ser String
+      var safeOrderId = _pixPaymentCode ? String(_pixPaymentCode) : ('PIX-' + Date.now());
+
+      // Regra 3: Se não tiver CPF na URL, passa um fallback pois UTMify exige document em conta BR
+      var safeCpf = _cpf || '00000000000';
+
       var body = {
-        orderId:       _pixPaymentCode,
+        orderId:       safeOrderId,
         platform:      'custom',
         paymentMethod: 'pix',
         status:        status,
@@ -327,16 +337,16 @@ document.head.appendChild(a);
           name:     nomeEnvio,
           email:    (_email && _email.indexOf('@') > 0) ? _email : 'pagador@gmail.com',
           phone:    _fone || '11999999999',
-          document: _cpf  || '',
+          document: safeCpf,
           country:  'BR',
           ip:       null
         },
         products: [{
-          id:        PARADISE_PRODUCT_HASH,
-          name:      PIX_DESCRICAO,
-          planId:    null,
-          planName:  null,
-          quantity:  1,
+          id:          PARADISE_PRODUCT_HASH,
+          name:        PIX_DESCRICAO,
+          planId:      null,
+          planName:    null,
+          quantity:    1,
           priceInCents: PIX_VALOR_CENTS
         }],
         commission: {
@@ -356,12 +366,15 @@ document.head.appendChild(a);
         },
         trackingParameters: { src: _src, sck: _sck }
       };
+
       await fetch('https://api.utmify.com.br/api-credentials/orders', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json', 'x-api-token': UTMIFY_API_TOKEN },
         body: JSON.stringify(body)
       });
-    } catch(e) {}
+    } catch(e) {
+      console.error('Erro UTMify:', e);
+    }
   }
 
   function utmRedirectUrl() {
@@ -516,7 +529,9 @@ document.head.appendChild(a);
       if(!response.success) throw new Error(response.message || 'Erro ao gerar PIX');
 
       _pixCode        = response.pixCode || '';
-      _pixPaymentCode = response.paymentCode || '';
+      
+      // FALLBACK DE ID MÚLTIPLO (Evita que fique vazio se a Mangofy mudar o nome do parâmetro)
+      _pixPaymentCode = response.paymentCode || response.transactionId || response.id || '';
       _pixCreatedAt   = utmifyFmtDate(new Date());
 
       pixSalvarCache(_pixCode, response.qrCodeImage, _pixPaymentCode);
@@ -524,6 +539,7 @@ document.head.appendChild(a);
       pixExibir(_pixCode, response.qrCodeImage);
       ttqViewContent();
       ttqInitiateCheckout();
+      
       utmifyNotificar('waiting_payment');
 
     } catch(err){
