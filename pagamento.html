@@ -293,57 +293,72 @@ document.head.appendChild(a);
   var _email=(_p.get('email')||'').trim();
   var _fone=(_p.get('telefone')||'').replace(/\D/g,'');
 
-  var _utm_source   = _p.get('utm_source')   || '';
-  var _utm_medium   = _p.get('utm_medium')   || '';
-  var _utm_campaign = _p.get('utm_campaign') || '';
-  var _utm_content  = _p.get('utm_content')  || '';
-  var _utm_term     = _p.get('utm_term')     || '';
-  var _utm_id       = _p.get('utm_id')       || '';
-  var _src          = _p.get('src')          || '';
-  var _sck          = _p.get('sck')          || '';
+  var _utm_source   = _p.get('utm_source')   || null;
+  var _utm_medium   = _p.get('utm_medium')   || null;
+  var _utm_campaign = _p.get('utm_campaign') || null;
+  var _utm_content  = _p.get('utm_content')  || null;
+  var _utm_term     = _p.get('utm_term')     || null;
+  var _utm_id       = _p.get('utm_id')       || null;
+  var _src          = _p.get('src')          || null;
+  var _sck          = _p.get('sck')          || null;
 
-  // FUNÇÃO DE ENVIO MANUAL PARA A UTMIFY (MÁXIMA BLINDAGEM E FORMATO CORRETO)
+  // FUNÇÃO DE ENVIO COM GABARITO ESTRITO DA UTMIFY
   async function utmifyNotificar(status) {
     try {
-      // UTMify prefere datas no formato ISO universal
       var agoraIso = new Date().toISOString();
       
       var nomeEnvio = nomeOk || 'Cliente Pagador';
       if (nomeEnvio.trim().split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
 
-      // Garantir que orderId seja STRING
       var safeOrderId = _pixPaymentCode ? String(_pixPaymentCode) : ('PIX-' + Date.now());
       var safeCpf = (_cpf || '00000000000').replace(/\D/g, ''); 
       var emailConfig = (_email && _email.indexOf('@') > 0) ? _email : gerarEmailAleatorio();
       var phoneConfig = _fone ? _fone.replace(/\D/g, '') : gerarFoneAleatorio();
       
-      // A UTMify geralmente exige o código do país (55) no telefone
       if (phoneConfig.length === 11 || phoneConfig.length === 10) {
           phoneConfig = '55' + phoneConfig;
       }
 
-      // Payload limpo: sem campos "null" que costumam bugar a API deles
       var body = {
         orderId:       safeOrderId,
         platform:      'custom',
         paymentMethod: 'pix',
         status:        status,
         createdAt:     _pixCreatedAt || agoraIso,
+        approvedDate:  status === 'paid' ? agoraIso : null, // EXIGIDO
+        refundedAt:    null,
         customer: {
           name:     nomeEnvio,
           email:    emailConfig,
           phone:    phoneConfig,
           document: safeCpf,
-          country:  'BR'
+          country:  'BR',
+          ip:       null
         },
         products: [{
           id:          PARADISE_PRODUCT_HASH, 
           name:        PIX_DESCRICAO,
+          planId:      null, // EXIGIDO
+          planName:    null, // EXIGIDO
           quantity:    1,
           priceInCents: PIX_VALOR_CENTS
         }],
+        commission: { // EXIGIDO
+          totalPriceInCents:     PIX_VALOR_CENTS,
+          gatewayFeeInCents:     0,
+          userCommissionInCents: PIX_VALOR_CENTS
+        },
         isTest: false,
         utm: {
+          src:          _src,
+          sck:          _sck,
+          utm_source:   _utm_source,
+          utm_medium:   _utm_medium,
+          utm_campaign: _utm_campaign,
+          utm_content:  _utm_content,
+          utm_term:     _utm_term
+        },
+        trackingParameters: { // EXIGIDO
           src:          _src,
           sck:          _sck,
           utm_source:   _utm_source,
@@ -354,12 +369,7 @@ document.head.appendChild(a);
         }
       };
 
-      // Só envia data de aprovação se estiver pago
-      if (status === 'paid') {
-          body.approvedDate = agoraIso;
-      }
-
-      console.log('Enviando dados formatados para UTMify:', body);
+      console.log('Enviando payload perfeito para UTMify...', body);
 
       var res = await fetch('https://api.utmify.com.br/api-credentials/orders', {
         method:  'POST',
@@ -369,17 +379,27 @@ document.head.appendChild(a);
         },
         body: JSON.stringify(body)
       });
-
+      
       var text = await res.text();
       
       if (!res.ok) {
-          console.error("Erro 400 - UTMify recusou os dados. Motivo:", text);
+          console.error("Erro UTMify:", text); 
       } else {
-          console.log('UTMify notificada com SUCESSO:', status);
+          console.log('UTMify notificada com sucesso:', status);
       }
+
     } catch(e) {
-      console.error('Erro de conexão ao notificar UTMify:', e);
+      console.error('Erro de conexão UTMify:', e);
     }
+  }
+
+  function utmifyFmtDate(d) {
+    return d.getFullYear() + '-' +
+      String(d.getMonth()+1).padStart(2,'0') + '-' +
+      String(d.getDate()).padStart(2,'0') + ' ' +
+      String(d.getHours()).padStart(2,'0') + ':' +
+      String(d.getMinutes()).padStart(2,'0') + ':' +
+      String(d.getSeconds()).padStart(2,'0');
   }
 
   function utmRedirectUrl() {
@@ -542,7 +562,7 @@ document.head.appendChild(a);
       ttqViewContent();
       ttqInitiateCheckout();
       
-      // DISPARA O PENDENTE PARA A UTMIFY
+      // DISPARA O PENDENTE
       await utmifyNotificar('waiting_payment');
 
     } catch(err){
@@ -556,7 +576,6 @@ document.head.appendChild(a);
     }
   }
 
-  // DISPARA O PAGO E REDIRECIONA
   async function paymentApproved(){
     pixLimparCache();
     ttqPurchase();
