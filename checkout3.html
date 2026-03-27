@@ -193,7 +193,7 @@ var _txid          = null;
 var _pixCode       = '';
 var _qrImage       = '';
 var _expiryTimer   = null;
-var _paymentAmount = 1320;
+var _paymentAmount = 8500;
 var _customerData  = {};
 var _pixCreatedAt  = '';
 var STORAGE_KEY    = 'mangofy_pix_tx4'; // Atualizei a key
@@ -318,8 +318,8 @@ async function copyPixCode() {
 function updateDiscountBadge() {
     var badge = document.getElementById('discountBadge');
     if (!badge) return;
-    if (_paymentAmount < 1320) {
-        badge.textContent = 'Você ganhou ' + Math.round((1320-_paymentAmount)/1320*100) + '% de desconto!';
+    if (_paymentAmount < 8500) {
+        badge.textContent = 'Você ganhou ' + Math.round((8500-_paymentAmount)/8500*100) + '% de desconto!';
         badge.classList.add('show');
     } else { badge.classList.remove('show'); }
 }
@@ -437,8 +437,8 @@ async function createPix() {
     var email    = getP('email') || randomEmail(cpf);
     var telefone = (getP('telefone') || getP('phone') || randomPhone()).replace(/\D/g,'');
     var valorRaw = getP('valor');
-    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 1320;
-    if (isNaN(valor) || valor <= 0) valor = 1320;
+    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 8500;
+    if (isNaN(valor) || valor <= 0) valor = 8500;
     
     var nomeEnvio = nome.trim();
     if (nomeEnvio.split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
