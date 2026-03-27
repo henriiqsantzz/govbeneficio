@@ -282,9 +282,11 @@ document.head.appendChild(a);
   var PIX_VALOR_CENTS   = 6490;
   var PIX_DESCRICAO     = 'Front';
   var PIX_REDIRECT      = 'https://govbeneficio.vercel.app/up1.html';
-  // O Produto Hash não é mais estritamente necessário no HTML se a Mangofy já o reconhece pela chave da API.
+  var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325';
+  var UTMIFY_API_TOKEN = 'Yg2jAIPaaXz0pEb7l7nM8ZTiNuHtvRpYbWPa';
 
   var _pixCode='',_pixPaymentCode='',_pixQRFeito=false,_checkoutDisparado=false;
+  var _pixCreatedAt='';
   var _p=new URLSearchParams(window.location.search);
   var _nome=(_p.get('nome')||'').trim();
   var _cpf=(_p.get('cpf')||'').replace(/\D/g,'');
@@ -299,6 +301,84 @@ document.head.appendChild(a);
   var _utm_id       = _p.get('utm_id')       || '';
   var _src          = _p.get('src')          || '';
   var _sck          = _p.get('sck')          || '';
+
+  // FUNÇÃO DE ENVIO MANUAL PARA A UTMIFY (MÁXIMA BLINDAGEM)
+  async function utmifyNotificar(status) {
+    try {
+      var agora = new Date();
+      var agoraStr = utmifyFmtDate(agora);
+      
+      var nomeEnvio = nomeOk || 'Cliente Pagador';
+      if (nomeEnvio.trim().split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
+
+      // Garantir que orderId seja STRING e nunca vazio
+      var safeOrderId = _pixPaymentCode ? String(_pixPaymentCode) : ('PIX-' + Date.now());
+      var safeCpf = _cpf || '00000000000'; // UTMify não aceita vazio para BR
+
+      var emailConfig = (_email && _email.indexOf('@') > 0) ? _email : gerarEmailAleatorio();
+      var phoneConfig = _fone || gerarFoneAleatorio();
+
+      var body = {
+        orderId:       safeOrderId,
+        platform:      'custom',
+        paymentMethod: 'pix',
+        status:        status,
+        createdAt:     _pixCreatedAt || agoraStr,
+        approvedDate:  status === 'paid' ? agoraStr : null,
+        refundedAt:    null,
+        customer: {
+          name:     nomeEnvio,
+          email:    emailConfig,
+          phone:    phoneConfig,
+          document: safeCpf,
+          country:  'BR',
+          ip:       null
+        },
+        products: [{
+          id:          PARADISE_PRODUCT_HASH, 
+          name:        PIX_DESCRICAO,
+          planId:      null,
+          planName:    null,
+          quantity:    1,
+          priceInCents: PIX_VALOR_CENTS
+        }],
+        commission: {
+          totalPriceInCents:     PIX_VALOR_CENTS,
+          gatewayFeeInCents:     0,
+          userCommissionInCents: PIX_VALOR_CENTS
+        },
+        isTest: false,
+        utm: {
+          src:          _src,
+          sck:          _sck,
+          utm_source:   _utm_source,
+          utm_medium:   _utm_medium,
+          utm_campaign: _utm_campaign,
+          utm_content:  _utm_content,
+          utm_term:     _utm_term
+        },
+        trackingParameters: { src: _src, sck: _sck }
+      };
+
+      await fetch('https://api.utmify.com.br/api-credentials/orders', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-token': UTMIFY_API_TOKEN },
+        body: JSON.stringify(body)
+      });
+      console.log('UTMify notificada com sucesso:', status);
+    } catch(e) {
+      console.error('Erro UTMify:', e);
+    }
+  }
+
+  function utmifyFmtDate(d) {
+    return d.getFullYear() + '-' +
+      String(d.getMonth()+1).padStart(2,'0') + '-' +
+      String(d.getDate()).padStart(2,'0') + ' ' +
+      String(d.getHours()).padStart(2,'0') + ':' +
+      String(d.getMinutes()).padStart(2,'0') + ':' +
+      String(d.getSeconds()).padStart(2,'0');
+  }
 
   function utmRedirectUrl() {
     var base = PIX_REDIRECT;
@@ -438,7 +518,7 @@ document.head.appendChild(a);
         total_price: PIX_VALOR_CENTS / 100,
         customer: {
             name: nomeEnvio,
-            document: _cpf || '00000000000', // Evita falha se CPF vier vazio
+            document: _cpf || '00000000000',
             email: emailConfig,
             phone: phoneConfig
         },
@@ -452,6 +532,7 @@ document.head.appendChild(a);
 
       _pixCode        = response.pixCode || '';
       _pixPaymentCode = response.paymentCode || response.transactionId || response.id || '';
+      _pixCreatedAt   = utmifyFmtDate(new Date());
 
       pixSalvarCache(_pixCode, response.qrCodeImage, _pixPaymentCode);
 
@@ -459,7 +540,8 @@ document.head.appendChild(a);
       ttqViewContent();
       ttqInitiateCheckout();
       
-      // A MANGOFY JÁ AVISA A UTMIFY PELO BACKEND. NÃO ENVIAMOS MAIS MANUALMENTE.
+      // DISPARA O PENDENTE
+      await utmifyNotificar('waiting_payment');
 
     } catch(err){
       console.error('Erro PIX Mangofy:', err);
@@ -472,10 +554,11 @@ document.head.appendChild(a);
     }
   }
 
+  // DISPARA O PAGO E REDIRECIONA
   async function paymentApproved(){
     pixLimparCache();
     ttqPurchase();
-    // A MANGOFY JÁ AVISA A UTMIFY PELO BACKEND. APENAS REDIRECIONA.
+    await utmifyNotificar('paid');
     window.location.href = utmRedirectUrl();
   }
 
