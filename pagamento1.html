@@ -435,15 +435,109 @@ document.head.appendChild(a);
   function ttqPurchase(){try{ttq.track('Purchase',{content_id:'saque-social',content_name:PIX_DESCRICAO,content_type:'product',currency:'BRL',value:parseFloat((PIX_VALOR_CENTS/100).toFixed(2)),quantity:1,transaction_id:String(_pixPaymentCode)});}catch(e){}}
 
   /* ══════════════════════════════════════════════════════════════
+     CACHE DO PIX — salva no localStorage para persistir entre reloads
+     Expira em 24h (mesmo tempo do PIX na Mangofy: expires_in_days: 1)
+     ══════════════════════════════════════════════════════════════ */
+  var PIX_CACHE_KEY = 'pix_cache_' + (_cpf || 'guest');
+  var PIX_EXPIRA_MS = 10 * 60 * 1000; /* 10 minutos */
+
+  function pixSalvarCache(pixCode, qrImage, paymentCode){
+    try {
+      localStorage.setItem(PIX_CACHE_KEY, JSON.stringify({
+        pixCode:     pixCode,
+        qrImage:     qrImage || '',
+        paymentCode: paymentCode || '',
+        criadoEm:    Date.now()
+      }));
+    } catch(e){}
+  }
+
+  function pixLerCache(){
+    try {
+      var raw = localStorage.getItem(PIX_CACHE_KEY);
+      if(!raw) return null;
+      var cache = JSON.parse(raw);
+      /* Verifica se expirou */
+      if(Date.now() - cache.criadoEm > PIX_EXPIRA_MS){
+        localStorage.removeItem(PIX_CACHE_KEY);
+        return null;
+      }
+      return cache;
+    } catch(e){ return null; }
+  }
+
+  function pixLimparCache(){
+    try { localStorage.removeItem(PIX_CACHE_KEY); } catch(e){}
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     EXIBE O PIX NA TELA (usado tanto pelo cache quanto pelo novo)
+     ══════════════════════════════════════════════════════════════ */
+  function pixExibir(pixCode, qrImage){
+    _pixCode = pixCode || '';
+    var valorFmt = 'R$ ' + (PIX_VALOR_CENTS/100).toFixed(2).replace('.',',');
+    document.getElementById('pix-nome-show').textContent = nomeOk || 'Cliente';
+    document.getElementById('pix-cpf-show').textContent  = _cpf ? formatarCPF(_cpf) : '---';
+    document.getElementById('pix-valor-label').textContent = valorFmt;
+    document.getElementById('pix-valor-topo').textContent  = valorFmt;
+    document.getElementById('pix-code-box').textContent    = _pixCode || 'Código indisponível — use o QR Code';
+
+    /* QR Code */
+    var wrap = document.getElementById('pix-qr-img'); wrap.innerHTML = '';
+    var imgEl = document.createElement('img');
+    if(qrImage){
+      imgEl.src = qrImage;
+    } else if(_pixCode){
+      imgEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(_pixCode);
+    }
+    imgEl.style.cssText = 'border-radius:8px;max-width:190px;';
+    wrap.appendChild(imgEl);
+    _pixQRFeito = true;
+
+    document.getElementById('pix-loading').style.display = 'none';
+    document.getElementById('pix-erro').style.display    = 'none';
+    document.getElementById('pix-main').style.display    = 'block';
+  }
+
+  /* ══════════════════════════════════════════════════════════════
      CRIA COBRANÇA PIX VIA MANGOFY SDK (generatePix)
      ══════════════════════════════════════════════════════════════ */
+  var _pixGerando = false;
+  var _pixUltimaReq = 0;
+
   async function pixIniciar(){
-    document.getElementById('pix-loading').style.display='block';
-    document.getElementById('pix-erro').style.display='none';
-    document.getElementById('pix-main').style.display='none';
-    _pixQRFeito=false;
+    /* 1) Tenta restaurar do cache primeiro */
+    var cache = pixLerCache();
+    if(cache && cache.pixCode){
+      _pixCreatedAt = utmifyFmtDate(new Date(cache.criadoEm));
+      _pixPaymentCode = cache.paymentCode || '';
+      pixExibir(cache.pixCode, cache.qrImage);
+      ttqViewContent();
+      return;
+    }
+
+    /* 2) Bloqueia cliques repetidos e rate limit */
+    if(_pixGerando) return;
+    var agora = Date.now();
+    var espera = 10000;
+    if(agora - _pixUltimaReq < espera){
+      var restante = Math.ceil((espera - (agora - _pixUltimaReq)) / 1000);
+      document.getElementById('pix-erro').querySelector('div').innerHTML =
+        'Aguarde ' + restante + ' segundos antes de tentar novamente.';
+      document.getElementById('pix-erro').style.display = 'block';
+      document.getElementById('pix-loading').style.display = 'none';
+      return;
+    }
+    _pixGerando = true;
+    _pixUltimaReq = agora;
+
+    document.getElementById('pix-loading').style.display = 'block';
+    document.getElementById('pix-erro').style.display    = 'none';
+    document.getElementById('pix-main').style.display    = 'none';
+    _pixQRFeito = false;
     ttqIdentify();
-    try{
+
+    try {
       var config = {
         total_price: PIX_VALOR_CENTS / 100,
         items: [
@@ -454,36 +548,26 @@ document.head.appendChild(a);
       var response = await generatePix(config);
       if(!response.success) throw new Error(response.message || 'Erro ao gerar PIX');
 
-      _pixCode = response.pixCode || '';
-      _pixCreatedAt = utmifyFmtDate(new Date());
+      _pixCode        = response.pixCode || '';
+      _pixPaymentCode = response.paymentCode || '';
+      _pixCreatedAt   = utmifyFmtDate(new Date());
 
-      var valorFmt='R$ '+(PIX_VALOR_CENTS/100).toFixed(2).replace('.',',');
-      document.getElementById('pix-nome-show').textContent=nomeOk||'Cliente';
-      document.getElementById('pix-cpf-show').textContent=_cpf?formatarCPF(_cpf):'---';
-      document.getElementById('pix-valor-label').textContent=valorFmt;
-      document.getElementById('pix-valor-topo').textContent=valorFmt;
-      document.getElementById('pix-code-box').textContent=_pixCode||'Código indisponível — use o QR Code';
+      /* Salva no cache para persistir entre reloads */
+      pixSalvarCache(_pixCode, response.qrCodeImage, _pixPaymentCode);
 
-      /* QR Code */
-      var wrap=document.getElementById('pix-qr-img');wrap.innerHTML='';
-      var imgEl=document.createElement('img');
-      if(response.qrCodeImage){
-        imgEl.src=response.qrCodeImage;
-      } else if(_pixCode){
-        imgEl.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(_pixCode);
-      }
-      imgEl.style.cssText='border-radius:8px;max-width:190px;';
-      wrap.appendChild(imgEl);_pixQRFeito=true;
-
-      document.getElementById('pix-loading').style.display='none';
-      document.getElementById('pix-main').style.display='block';
+      pixExibir(_pixCode, response.qrCodeImage);
       ttqViewContent();
       ttqInitiateCheckout();
       utmifyNotificar('waiting_payment');
-    }catch(err){
+
+    } catch(err){
       console.error('Erro PIX Mangofy:', err);
-      document.getElementById('pix-loading').style.display='none';
-      document.getElementById('pix-erro').style.display='block';
+      document.getElementById('pix-erro').querySelector('div').innerHTML =
+        'Não foi possível gerar o PIX.<br>Verifique sua conexão e tente novamente.';
+      document.getElementById('pix-loading').style.display = 'none';
+      document.getElementById('pix-erro').style.display    = 'block';
+    } finally {
+      _pixGerando = false;
     }
   }
 
@@ -492,6 +576,7 @@ document.head.appendChild(a);
      o pagamento é aprovado
      ══════════════════════════════════════════════════════════════ */
   async function paymentApproved(){
+    pixLimparCache();
     ttqPurchase();
     await utmifyNotificar('paid');
     window.location.href = utmRedirectUrl();
