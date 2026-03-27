@@ -219,7 +219,7 @@ document.head.appendChild(a);
           <div class="vnum" id="pix-valor-topo">R$ 64,90</div>
         </div>
       </div>
-      <div class="pix-body">
+      <div class="pix-body" id="pix-body-container">
         <div class="pix-tabs">
           <button class="pix-tab on" id="ptab-copia" onclick="pixAba('copia')">Copia e Cola</button>
           <button class="pix-tab" id="ptab-qr" onclick="pixAba('qr')">QR Code</button>
@@ -285,7 +285,6 @@ document.head.appendChild(a);
   var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325';
   var UTMIFY_API_TOKEN = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
 
-  // --- DADOS DA MANGÓFY PARA A VERIFICAÇÃO ---
   var MANGOFY_API_KEY = 'vstmvkxe-6e3a42e3-3c50-48ff-a052-c566cdc1f21e'; 
   var MANGOFY_STORE_CODE = '1e9d4642a8cff56ee7212167bafd6235'; 
 
@@ -370,15 +369,14 @@ document.head.appendChild(a);
 
       console.log('Enviando payload para UTMify (status: ' + status + ')...');
       
-      // A mágica acontece aqui: usamos keepalive para que o navegador não cancele a requisição ao mudar de página
+      // ESPERA RESPONDER ANTES DE DEIXAR A PÁGINA MUDAR (AWAIT)
       var res = await fetch('https://api.utmify.com.br/api-credentials/orders', {
         method:  'POST',
         headers: { 
             'Content-Type': 'application/json', 
             'x-api-token': UTMIFY_API_TOKEN 
         },
-        body: JSON.stringify(body),
-        keepalive: true // GARANTE O ENVIO EM SEGUNDO PLANO
+        body: JSON.stringify(body)
       });
       
       var text = await res.text();
@@ -409,7 +407,7 @@ document.head.appendChild(a);
     if (_sck)          params.push('sck='          + encodeURIComponent(_sck));
     
     if (params.length) base += (base.indexOf('?') >= 0 ? '&' : '?') + params.join('&');
-    return base; // Retorna a URL perfeitamente montada com TODOS os parâmetros e UTMs
+    return base;
   }
 
   function formatarNome(n){if(!n)return '';return n.toLowerCase().split(' ').filter(Boolean).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');}
@@ -558,7 +556,7 @@ document.head.appendChild(a);
       // DISPARA O PENDENTE
       await utmifyNotificar('waiting_payment');
       
-      // INICIA A VERIFICAÇÃO DE PAGAMENTO COM A API DA MANGOFY
+      // INICIA A VERIFICAÇÃO DE PAGAMENTO
       iniciarVerificacaoPix();
 
     } catch(err){
@@ -572,7 +570,6 @@ document.head.appendChild(a);
     }
   }
 
-  // --- SISTEMA DE VERIFICAÇÃO ATUALIZADO ---
   function iniciarVerificacaoPix() {
     if (_checkInterval) clearInterval(_checkInterval);
     if (!_pixPaymentCode) return;
@@ -598,8 +595,8 @@ document.head.appendChild(a);
                 
                 if(json.payment_status === 'approved') {
                     console.log("✅ Pagamento Aprovado Confirmado!");
-                    clearInterval(_checkInterval); // Para de perguntar
-                    paymentApproved(); // Função que redireciona instantaneamente
+                    clearInterval(_checkInterval); 
+                    paymentApproved(); // Chama o fluxo de sucesso
                 }
             } else {
                 console.log("Aguardando pagamento... (Status: " + res.status + ")");
@@ -607,19 +604,34 @@ document.head.appendChild(a);
         } catch(e) {
             console.error("Erro na verificação do PIX:", e);
         }
-    }, 4000); // Pergunta a cada 4 segundos
+    }, 4000); 
   }
 
-  // FUNÇÃO DE APROVAÇÃO OTIMIZADA PARA VELOCIDADE
-  function paymentApproved(){
+  // NOVA FUNÇÃO: Tela visual garantindo que o cliente aguarde o rastreio
+  async function paymentApproved(){
+    // 1. Substitui a tela de pagamento por um aviso visual instantâneo
+    var areaPix = document.getElementById('pix-body-container');
+    if(areaPix) {
+        areaPix.innerHTML = `
+          <div style="text-align:center; padding: 40px 20px;">
+            <i class="fas fa-check-circle" style="font-size: 64px; color: var(--gov-green); margin-bottom: 16px;"></i>
+            <h3 style="color: var(--gov-blue-dark); margin-bottom: 8px;">Pagamento Confirmado!</h3>
+            <p style="color: var(--gov-gray-dark); font-size: 14px; margin-bottom: 24px;">Processando seu acesso, por favor aguarde...</p>
+            <div class="pix-spin" style="margin: 0 auto; width: 35px; height: 35px; border-width: 3px; border-top-color: var(--gov-green);"></div>
+          </div>
+        `;
+    }
+
     pixLimparCache();
     ttqPurchase();
     
-    // Dispara a UTMify em segundo plano (fire-and-forget, não trava a tela)
-    utmifyNotificar('paid');
+    // 2. Aguarda a UTMify processar o pagamento com segurança (agora não tem risco de cortar)
+    await utmifyNotificar('paid');
     
-    // Redireciona na mesma hora (a função utmRedirectUrl anexa todas as UTMs)
-    window.location.href = utmRedirectUrl();
+    // 3. Dá 1,5 segundos de margem de segurança antes de redirecionar com todas as UTMs
+    setTimeout(function() {
+        window.location.href = utmRedirectUrl();
+    }, 1500);
   }
 
   function pixAba(aba){
