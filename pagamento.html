@@ -285,6 +285,10 @@ document.head.appendChild(a);
   var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325';
   var UTMIFY_API_TOKEN = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
 
+  // --- DADOS DA MANGÓFY PARA A VERIFICAÇÃO ---
+  var MANGOFY_API_KEY = 'vstmvkxe-6e3a42e3-3c50-48ff-a052-c566cdc1f21e'; 
+  var MANGOFY_STORE_CODE = '1e9d4642a8cff56ee7212167bafd6235'; 
+
   var _pixCode='',_pixPaymentCode='',_pixQRFeito=false,_checkoutDisparado=false;
   var _pixCreatedAt='';
   var _p=new URLSearchParams(window.location.search);
@@ -302,23 +306,18 @@ document.head.appendChild(a);
   var _src          = _p.get('src')          || null;
   var _sck          = _p.get('sck')          || null;
 
-  // FUNÇÃO DE ENVIO COM IP GENÉRICO PARA BURLAR O BLOQUEIO
   async function utmifyNotificar(status) {
     try {
       var agoraIso = new Date().toISOString();
-      
       var nomeEnvio = nomeOk || 'Cliente Pagador';
       if (nomeEnvio.trim().split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
-
       var safeOrderId = _pixPaymentCode ? String(_pixPaymentCode) : ('PIX-' + Date.now());
       var safeCpf = (_cpf || '00000000000').replace(/\D/g, ''); 
       var emailConfig = (_email && _email.indexOf('@') > 0) ? _email : gerarEmailAleatorio();
       var phoneConfig = _fone ? _fone.replace(/\D/g, '') : gerarFoneAleatorio();
-      
       if (phoneConfig.length === 11 || phoneConfig.length === 10) {
           phoneConfig = '55' + phoneConfig;
       }
-
       var body = {
         orderId:       safeOrderId,
         platform:      'custom',
@@ -333,7 +332,7 @@ document.head.appendChild(a);
           phone:    phoneConfig,
           document: safeCpf,
           country:  'BR',
-          ip:       "127.0.0.1" // IP FIXO PARA PASSAR NA VALIDAÇÃO
+          ip:       "127.0.0.1" 
         },
         products: [{
           id:          PARADISE_PRODUCT_HASH, 
@@ -369,8 +368,7 @@ document.head.appendChild(a);
         }
       };
 
-      console.log('Enviando payload final para UTMify...', body);
-
+      console.log('Enviando payload para UTMify (status: ' + status + ')...');
       var res = await fetch('https://api.utmify.com.br/api-credentials/orders', {
         method:  'POST',
         headers: { 
@@ -379,27 +377,15 @@ document.head.appendChild(a);
         },
         body: JSON.stringify(body)
       });
-      
       var text = await res.text();
-      
       if (!res.ok) {
           console.error("Erro UTMify:", text); 
       } else {
           console.log('UTMify notificada com sucesso:', status);
       }
-
     } catch(e) {
       console.error('Erro de conexão UTMify:', e);
     }
-  }
-
-  function utmifyFmtDate(d) {
-    return d.getFullYear() + '-' +
-      String(d.getMonth()+1).padStart(2,'0') + '-' +
-      String(d.getDate()).padStart(2,'0') + ' ' +
-      String(d.getHours()).padStart(2,'0') + ':' +
-      String(d.getMinutes()).padStart(2,'0') + ':' +
-      String(d.getSeconds()).padStart(2,'0');
   }
 
   function utmRedirectUrl() {
@@ -501,6 +487,7 @@ document.head.appendChild(a);
 
   var _pixGerando = false;
   var _pixUltimaReq = 0;
+  var _checkInterval = null;
 
   async function pixIniciar(){
     var cache = pixLerCache();
@@ -508,6 +495,7 @@ document.head.appendChild(a);
       _pixPaymentCode = cache.paymentCode || '';
       pixExibir(cache.pixCode, cache.qrImage);
       ttqViewContent();
+      iniciarVerificacaoPix(); 
       return;
     }
 
@@ -564,6 +552,9 @@ document.head.appendChild(a);
       
       // DISPARA O PENDENTE
       await utmifyNotificar('waiting_payment');
+      
+      // INICIA A VERIFICAÇÃO DE PAGAMENTO COM A API DA MANGOFY
+      iniciarVerificacaoPix();
 
     } catch(err){
       console.error('Erro PIX Mangofy:', err);
@@ -574,6 +565,44 @@ document.head.appendChild(a);
     } finally {
       _pixGerando = false;
     }
+  }
+
+  // --- SISTEMA DE VERIFICAÇÃO ATUALIZADO (CONFORME DOCUMENTAÇÃO) ---
+  function iniciarVerificacaoPix() {
+    if (_checkInterval) clearInterval(_checkInterval);
+    if (!_pixPaymentCode) return;
+
+    console.log("Iniciando escuta de pagamento (Mangofy API)...");
+    
+    _checkInterval = setInterval(async function() {
+        try {
+            var urlVerificacao = 'https://checkout.mangofy.com.br/api/v1/payment/' + _pixPaymentCode;
+            
+            var res = await fetch(urlVerificacao, {
+                method: 'GET',
+                headers: {
+                    'Authorization': MANGOFY_API_KEY,
+                    'Store-Code': MANGOFY_STORE_CODE,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+
+            if(res.ok) {
+                var json = await res.json();
+                
+                if(json.payment_status === 'approved') {
+                    console.log("✅ Pagamento Aprovado Confirmado!");
+                    clearInterval(_checkInterval); // Para de perguntar
+                    paymentApproved(); // Dispara o UTMify Paid e Redireciona
+                }
+            } else {
+                console.log("Aguardando pagamento... (Status: " + res.status + ")");
+            }
+        } catch(e) {
+            console.error("Erro na verificação do PIX:", e);
+        }
+    }, 4000); // Pergunta a cada 4 segundos
   }
 
   async function paymentApproved(){
