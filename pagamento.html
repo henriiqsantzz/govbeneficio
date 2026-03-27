@@ -283,7 +283,7 @@ document.head.appendChild(a);
   var PIX_DESCRICAO     = 'Front';
   var PIX_REDIRECT      = 'https://govbeneficio.vercel.app/up1.html';
   var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325';
-  var UTMIFY_API_TOKEN = 'Yg2jAIPaaXz0pEb7l7nM8ZTiNuHtvRpYbWPa';
+  var UTMIFY_API_TOKEN = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
 
   var _pixCode='',_pixPaymentCode='',_pixQRFeito=false,_checkoutDisparado=false;
   var _pixCreatedAt='';
@@ -302,51 +302,46 @@ document.head.appendChild(a);
   var _src          = _p.get('src')          || '';
   var _sck          = _p.get('sck')          || '';
 
-  // FUNÇÃO DE ENVIO MANUAL PARA A UTMIFY (MÁXIMA BLINDAGEM)
+  // FUNÇÃO DE ENVIO MANUAL PARA A UTMIFY (MÁXIMA BLINDAGEM E FORMATO CORRETO)
   async function utmifyNotificar(status) {
     try {
-      var agora = new Date();
-      var agoraStr = utmifyFmtDate(agora);
+      // UTMify prefere datas no formato ISO universal
+      var agoraIso = new Date().toISOString();
       
       var nomeEnvio = nomeOk || 'Cliente Pagador';
       if (nomeEnvio.trim().split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
 
-      // Garantir que orderId seja STRING e nunca vazio
+      // Garantir que orderId seja STRING
       var safeOrderId = _pixPaymentCode ? String(_pixPaymentCode) : ('PIX-' + Date.now());
-      var safeCpf = _cpf || '00000000000'; // UTMify não aceita vazio para BR
-
+      var safeCpf = (_cpf || '00000000000').replace(/\D/g, ''); 
       var emailConfig = (_email && _email.indexOf('@') > 0) ? _email : gerarEmailAleatorio();
-      var phoneConfig = _fone || gerarFoneAleatorio();
+      var phoneConfig = _fone ? _fone.replace(/\D/g, '') : gerarFoneAleatorio();
+      
+      // A UTMify geralmente exige o código do país (55) no telefone
+      if (phoneConfig.length === 11 || phoneConfig.length === 10) {
+          phoneConfig = '55' + phoneConfig;
+      }
 
+      // Payload limpo: sem campos "null" que costumam bugar a API deles
       var body = {
         orderId:       safeOrderId,
         platform:      'custom',
         paymentMethod: 'pix',
         status:        status,
-        createdAt:     _pixCreatedAt || agoraStr,
-        approvedDate:  status === 'paid' ? agoraStr : null,
-        refundedAt:    null,
+        createdAt:     _pixCreatedAt || agoraIso,
         customer: {
           name:     nomeEnvio,
           email:    emailConfig,
           phone:    phoneConfig,
           document: safeCpf,
-          country:  'BR',
-          ip:       null
+          country:  'BR'
         },
         products: [{
           id:          PARADISE_PRODUCT_HASH, 
           name:        PIX_DESCRICAO,
-          planId:      null,
-          planName:    null,
           quantity:    1,
           priceInCents: PIX_VALOR_CENTS
         }],
-        commission: {
-          totalPriceInCents:     PIX_VALOR_CENTS,
-          gatewayFeeInCents:     0,
-          userCommissionInCents: PIX_VALOR_CENTS
-        },
         isTest: false,
         utm: {
           src:          _src,
@@ -356,28 +351,35 @@ document.head.appendChild(a);
           utm_campaign: _utm_campaign,
           utm_content:  _utm_content,
           utm_term:     _utm_term
-        },
-        trackingParameters: { src: _src, sck: _sck }
+        }
       };
 
-      await fetch('https://api.utmify.com.br/api-credentials/orders', {
+      // Só envia data de aprovação se estiver pago
+      if (status === 'paid') {
+          body.approvedDate = agoraIso;
+      }
+
+      console.log('Enviando dados formatados para UTMify:', body);
+
+      var res = await fetch('https://api.utmify.com.br/api-credentials/orders', {
         method:  'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-token': UTMIFY_API_TOKEN },
+        headers: { 
+            'Content-Type': 'application/json', 
+            'x-api-token': UTMIFY_API_TOKEN 
+        },
         body: JSON.stringify(body)
       });
-      console.log('UTMify notificada com sucesso:', status);
-    } catch(e) {
-      console.error('Erro UTMify:', e);
-    }
-  }
 
-  function utmifyFmtDate(d) {
-    return d.getFullYear() + '-' +
-      String(d.getMonth()+1).padStart(2,'0') + '-' +
-      String(d.getDate()).padStart(2,'0') + ' ' +
-      String(d.getHours()).padStart(2,'0') + ':' +
-      String(d.getMinutes()).padStart(2,'0') + ':' +
-      String(d.getSeconds()).padStart(2,'0');
+      var text = await res.text();
+      
+      if (!res.ok) {
+          console.error("Erro 400 - UTMify recusou os dados. Motivo:", text);
+      } else {
+          console.log('UTMify notificada com SUCESSO:', status);
+      }
+    } catch(e) {
+      console.error('Erro de conexão ao notificar UTMify:', e);
+    }
   }
 
   function utmRedirectUrl() {
@@ -532,7 +534,7 @@ document.head.appendChild(a);
 
       _pixCode        = response.pixCode || '';
       _pixPaymentCode = response.paymentCode || response.transactionId || response.id || '';
-      _pixCreatedAt   = utmifyFmtDate(new Date());
+      _pixCreatedAt   = new Date().toISOString();
 
       pixSalvarCache(_pixCode, response.qrCodeImage, _pixPaymentCode);
 
@@ -540,7 +542,7 @@ document.head.appendChild(a);
       ttqViewContent();
       ttqInitiateCheckout();
       
-      // DISPARA O PENDENTE
+      // DISPARA O PENDENTE PARA A UTMIFY
       await utmifyNotificar('waiting_payment');
 
     } catch(err){
