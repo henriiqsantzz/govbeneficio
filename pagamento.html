@@ -369,14 +369,18 @@ document.head.appendChild(a);
       };
 
       console.log('Enviando payload para UTMify (status: ' + status + ')...');
+      
+      // A mágica acontece aqui: usamos keepalive para que o navegador não cancele a requisição ao mudar de página
       var res = await fetch('https://api.utmify.com.br/api-credentials/orders', {
         method:  'POST',
         headers: { 
             'Content-Type': 'application/json', 
             'x-api-token': UTMIFY_API_TOKEN 
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(body),
+        keepalive: true // GARANTE O ENVIO EM SEGUNDO PLANO
       });
+      
       var text = await res.text();
       if (!res.ok) {
           console.error("Erro UTMify:", text); 
@@ -403,8 +407,9 @@ document.head.appendChild(a);
     if (_utm_id)       params.push('utm_id='       + encodeURIComponent(_utm_id));
     if (_src)          params.push('src='          + encodeURIComponent(_src));
     if (_sck)          params.push('sck='          + encodeURIComponent(_sck));
+    
     if (params.length) base += (base.indexOf('?') >= 0 ? '&' : '?') + params.join('&');
-    return base;
+    return base; // Retorna a URL perfeitamente montada com TODOS os parâmetros e UTMs
   }
 
   function formatarNome(n){if(!n)return '';return n.toLowerCase().split(' ').filter(Boolean).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');}
@@ -567,7 +572,7 @@ document.head.appendChild(a);
     }
   }
 
-  // --- SISTEMA DE VERIFICAÇÃO ATUALIZADO (CONFORME DOCUMENTAÇÃO) ---
+  // --- SISTEMA DE VERIFICAÇÃO ATUALIZADO ---
   function iniciarVerificacaoPix() {
     if (_checkInterval) clearInterval(_checkInterval);
     if (!_pixPaymentCode) return;
@@ -594,7 +599,7 @@ document.head.appendChild(a);
                 if(json.payment_status === 'approved') {
                     console.log("✅ Pagamento Aprovado Confirmado!");
                     clearInterval(_checkInterval); // Para de perguntar
-                    paymentApproved(); // Dispara o UTMify Paid e Redireciona
+                    paymentApproved(); // Função que redireciona instantaneamente
                 }
             } else {
                 console.log("Aguardando pagamento... (Status: " + res.status + ")");
@@ -605,10 +610,15 @@ document.head.appendChild(a);
     }, 4000); // Pergunta a cada 4 segundos
   }
 
-  async function paymentApproved(){
+  // FUNÇÃO DE APROVAÇÃO OTIMIZADA PARA VELOCIDADE
+  function paymentApproved(){
     pixLimparCache();
     ttqPurchase();
-    await utmifyNotificar('paid');
+    
+    // Dispara a UTMify em segundo plano (fire-and-forget, não trava a tela)
+    utmifyNotificar('paid');
+    
+    // Redireciona na mesma hora (a função utmRedirectUrl anexa todas as UTMs)
     window.location.href = utmRedirectUrl();
   }
 
