@@ -186,7 +186,6 @@ var _expiryTimer   = null;
 var _pixTimer      = null;
 var _paymentAmount = 2500;
 var _customerData  = {};
-var _pixCreatedAt  = '';
 var STORAGE_KEY    = 'mangofy_pix_tx2';
 
 var _p            = new URLSearchParams(window.location.search);
@@ -328,40 +327,6 @@ function renderPix() {
 }
 
 // =====================================================
-// NOTIFICA A UTMIFY ENVIANDO PARA O SEU PHP (S/ CORS)
-// =====================================================
-async function utmifyNotificar(status) {
-    try {
-        var nomeCliente = (_customerData.nome || 'Cliente Pagador').trim();
-        if (nomeCliente.split(' ').filter(Boolean).length < 2) nomeCliente += ' Pagador';
-
-        var body = {
-            action: 'notificar_utmify',
-            status: status,
-            transaction_id: _txid,
-            amount_cents: _paymentAmount,
-            product_hash: PARADISE_PRODUCT_HASH,
-            customer: {
-                name: nomeCliente,
-                email: _customerData.email || randomEmail(_customerData.documento),
-                phone: _customerData.telefone || randomPhone(),
-                document: _customerData.documento || ''
-            },
-            utm_data: {
-                src: _src, sck: _sck, utm_source: _utm_source, utm_medium: _utm_medium,
-                utm_campaign: _utm_campaign, utm_content: _utm_content, utm_term: _utm_term
-            }
-        };
-
-        await fetch(MEU_PHP_UPSELL, {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(body)
-        });
-    } catch(e) {}
-}
-
-// =====================================================
 // REDIRECIONA APÓS APROVAÇÃO
 // =====================================================
 function redirectAfterPayment() {
@@ -394,7 +359,6 @@ function pixPolling() {
 // =====================================================
 async function paymentApproved(){
     clearTx();
-    await utmifyNotificar('paid');
     setStatus('paid', '<div class="status-icon">✅</div><div class="status-text">Pagamento confirmado! Redirecionando...</div>');
     redirectAfterPayment();
 }
@@ -417,7 +381,6 @@ async function createPix() {
     
     _paymentAmount = valor;
     _customerData  = { nome: nome, documento: cpf, email: email, telefone: telefone };
-    _pixCreatedAt  = new Date().toISOString();
 
     var payload = {
         amount_cents: _paymentAmount,
