@@ -337,9 +337,17 @@ fbq('track', 'PageView');
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
+            
             var data = await res.json();
             
-            if(!res.ok || !data.qr_code) throw new Error();
+            // 🔥 MUDANÇA AQUI: Se der erro, joga o motivo real no console!
+            if(!res.ok) {
+                console.error("🔥 MOTIVO DO ERRO NA PENGUIMPAY:", data);
+                throw new Error("A API recusou a requisição.");
+            }
+            
+            if(!data.qr_code) throw new Error("QR Code não retornado.");
+            
             _pixTxid = data.transaction_id;
             _pixCode = data.qr_code;
 
@@ -350,7 +358,11 @@ fbq('track', 'PageView');
             document.getElementById('pix-loading').style.display = 'none';
             document.getElementById('pix-main').style.display = 'block';
             pixPolling();
-        }catch(err){ document.getElementById('pix-loading').style.display='none'; alert('Erro ao gerar PIX.'); }
+        }catch(err){ 
+            console.error("Erro capturado:", err);
+            document.getElementById('pix-loading').style.display='none'; 
+            alert('Erro ao gerar PIX. Verifique o console.'); 
+        }
     }
 
     function pixPolling(){
